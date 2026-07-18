@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #1a2a6c;
+  --brand: #b01c2e;
+  --gold: #c9a84c;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "DM Sans", system-ui, sans-serif;
+  color: #1f2430;
+}
+
+h1, h2, h3, h4,
+.font-display {
+  font-family: "Fraunces", serif;
+}
+
+/* content sits below the fixed navbar */
+.page-offset {
+  padding-top: 92px;
+}
+
+::selection {
+  background: var(--gold);
+  color: #1a2a6c;
+}

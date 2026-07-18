@@ -1,0 +1,28 @@
+.applybutton {
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    background: transparent;
+    color: #ffffff;
+    background-color: rgba(176, 3, 15, 0.922);
+    font-family: inherit;
+}
+
+.counselingbutton {
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+
+    background: transparent;
+    color: #ffffff;
+    border: #ffffff solid 2px;
+    font-family: inherit;
+}
+.herophoto{
+    display: flex;
+    justify-content: flex-end;
+}
