@@ -13,9 +13,11 @@ dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 const app = express();
 
-const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
-    .split(",")
-    .map((o) => o.trim());
+const allowedOrigins = (
+  process.env.CLIENT_ORIGIN || "https://arz-international.vercel.app/"
+)
+  .split(",")
+  .map((o) => o.trim());
 
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
