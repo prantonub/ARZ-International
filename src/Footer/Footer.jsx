@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import ApplyButton from "../Component2/ApplyButton";
 import { goToApplicationForm } from "../utils/scrollToForm";
 
+
 function getOfficeStatus() {
   const now = new Date();
   const day = now.getDay();
@@ -43,7 +44,7 @@ export default function Footer() {
     if (!email.includes("@")) return;
     setSubState("loading");
     try {
-      const response = await fetch("/api/newsletter", {
+      const response = await fetch("http://localhost:5000/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -51,6 +52,11 @@ export default function Footer() {
       if (response.ok) {
         setSubState("done");
         setEmail("");
+        
+          setTimeout(() => {
+            setSubState("idle");
+          }, 2000);
+
       } else {
         setSubState("error");
       }

@@ -365,7 +365,7 @@ export default function Portfolio() {
         <img
           src={officePhoto}
           alt="Inside the ARZ International office"
-          className="w-full h-[320px] md:h-[400px] object-cover"
+          className="w-full h-[320px] md:h-[550px] object-cover"
         />
         <div
           className="absolute inset-0"

@@ -7,6 +7,10 @@ import applicationRoutes from "./routes/applications.js";
 import contactRoutes from "./routes/contact.js";
 import newsletterRoutes from "./routes/newsletter.js";
 
+import dns from 'dns';
+// Change DNS
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
 const app = express();
 
 const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
