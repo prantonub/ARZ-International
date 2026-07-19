@@ -44,7 +44,7 @@ export default function Footer() {
     if (!email.includes("@")) return;
     setSubState("loading");
     try {
-      const response = await fetch("http://localhost:5000/api/newsletter", {
+      const response = await fetch("https://arz-international.vercel.app/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
