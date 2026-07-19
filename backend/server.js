@@ -20,6 +20,12 @@ const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "ARZ International Backend Running Successfully 🚀",
+  });
+});
+
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 
 app.use("/api/applications", applicationRoutes);
