@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { goToApplicationForm } from "../../utils/scrollToForm";
 import "../../App.css";
 
 const reviewsData = [
@@ -174,6 +176,11 @@ const reviewsData = [
 
 export default function ReviewPage() {
   const [filter, setFilter] = useState("All");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBookAssessment = () =>
+    goToApplicationForm(navigate, location.pathname);
 
   const filteredReviews =
     filter === "All"
@@ -295,7 +302,10 @@ export default function ReviewPage() {
             ARZ International.
           </p>
           <div className="flex justify-center">
-            <button className="px-6 py-2.5 rounded-full text-xs font-bold bg-white text-slate-950 hover:bg-slate-100 transition-colors active:scale-95">
+            <button
+              onClick={handleBookAssessment}
+              className="px-6 py-2.5 rounded-full text-xs font-bold bg-white text-slate-950 hover:bg-slate-100 transition-colors active:scale-95"
+            >
               Book Assessment
             </button>
           </div>
