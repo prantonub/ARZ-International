@@ -14,7 +14,7 @@ dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const app = express();
 
 const allowedOrigins = (
-  process.env.CLIENT_ORIGIN || "https://arz-international.vercel.app/"
+  process.env.CLIENT_ORIGIN || "https://arz-international.vercel.app"
 )
   .split(",")
   .map((o) => o.trim());
