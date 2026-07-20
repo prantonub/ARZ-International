@@ -1,6 +1,16 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { goToApplicationForm } from "../../utils/scrollToForm";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ApplicationForm from "../../Form/ApplicationForm";
 import ukImage from "../../assets/Uk.jpg";
+
+// Generic campus imagery — not claimed to be each university's real
+// campus, just a visual placeholder until the admin panel lets you
+// upload a real photo per university.
+const campusImages = [
+  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=700&q=80",
+  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=700&q=80",
+  "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=700&q=80",
+];
 
 // ── University data ──────────────────────────────────────────────────
 // Structured so this array can later be swapped for data fetched from
@@ -105,36 +115,19 @@ const universities = [
   },
 ];
 
-function UniversityCard({ uni, onApply }) {
-  const initials =
-    uni.name
-      .split(" ")
-      .filter((w) => w[0] === w[0]?.toUpperCase() && w.length > 2)
-      .slice(0, 2)
-      .map((w) => w[0])
-      .join("") || uni.name.slice(0, 2).toUpperCase();
-
+// ── University card — minimal: image, name, short description ────────
+function UniversityCard({ uni, image, onDetails, onApply }) {
   return (
     <div
       className="rounded-2xl overflow-hidden bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
       style={{ border: "1px solid #eef0f8" }}
     >
-      {/* Image / placeholder banner */}
-      <div
-        className="relative h-36 flex items-center justify-center"
-        style={{ background: "linear-gradient(135deg, #1a2a6c, #2b3d8f)" }}
-      >
-        {uni.image ? (
-          <img
-            src={uni.image}
-            alt={uni.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <span className="font-display font-black text-3xl text-white/90 tracking-wide">
-            {initials}
-          </span>
-        )}
+      <div className="relative h-40">
+        <img
+          src={uni.image || image}
+          alt={uni.name}
+          className="w-full h-full object-cover"
+        />
         <span
           className="absolute top-3 right-3 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full"
           style={{ background: "#fdf3e2", color: "#a4863a" }}
@@ -150,78 +143,189 @@ function UniversityCard({ uni, onApply }) {
         >
           {uni.name}
         </h3>
-        <p className="text-xs mt-0.5" style={{ color: "#888" }}>
-          {uni.location}
-        </p>
-
-        <p className="text-sm mt-3 leading-relaxed" style={{ color: "#555" }}>
+        <p className="text-sm mt-2 leading-relaxed" style={{ color: "#666" }}>
           {uni.description}
         </p>
 
-        <div className="mt-4 pt-4" style={{ borderTop: "1px solid #f0f2f8" }}>
-          <p
-            className="text-xs font-bold uppercase tracking-wide mb-2"
-            style={{ color: "#c9a84c" }}
+        <div className="flex gap-2 mt-5">
+          <button
+            onClick={() => onDetails(uni)}
+            className="flex-1 py-2.5 rounded-full text-xs font-bold cursor-pointer transition-colors"
+            style={{
+              background: "#f0f2ff",
+              color: "#1a2a6c",
+              border: "1px solid #e5e7f0",
+            }}
           >
-            Requirements
-          </p>
-          <ul className="space-y-1.5">
-            {uni.requirements.map((r) => (
-              <li
-                key={r}
-                className="flex items-start gap-2 text-xs"
-                style={{ color: "#555" }}
-              >
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#0f6e56"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="flex-shrink-0 mt-0.5"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span>{r}</span>
-              </li>
-            ))}
-          </ul>
+            Details
+          </button>
+          <button
+            onClick={onApply}
+            className="flex-1 py-2.5 rounded-full text-xs font-bold text-white border-none cursor-pointer transition-colors"
+            style={{ background: "#b01c2e" }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#8e1422")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#b01c2e")}
+          >
+            Apply Now
+          </button>
         </div>
+      </div>
+    </div>
+  );
+}
 
-        <div
-          className="flex items-center justify-between mt-4 pt-4"
-          style={{ borderTop: "1px solid #f0f2f8" }}
-        >
-          <div>
-            <div className="text-xs" style={{ color: "#999" }}>
-              Tuition
-            </div>
-            <div className="text-sm font-bold" style={{ color: "#1a2a6c" }}>
-              {uni.tuition}
-            </div>
-          </div>
-          <div>
-            <div className="text-xs" style={{ color: "#999" }}>
-              Intake
-            </div>
-            <div className="text-sm font-bold" style={{ color: "#1a2a6c" }}>
-              {uni.intake}
-            </div>
-          </div>
-        </div>
-
+// ── Details popup — everything the card doesn't show ──────────────────
+function DetailsModal({ uni, image, onClose, onApply }) {
+  return (
+    <div
+      className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+      style={{ background: "rgba(15,23,42,0.6)", backdropFilter: "blur(4px)" }}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="relative bg-white rounded-2xl max-w-lg w-full max-h-[88vh] overflow-y-auto">
         <button
-          onClick={onApply}
-          className="w-full mt-4 py-2.5 rounded-full text-xs font-bold text-white border-none cursor-pointer transition-colors"
-          style={{ background: "#b01c2e" }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "#8e1422")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "#b01c2e")}
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-lg border-none cursor-pointer"
         >
-          Apply Now →
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1a2a6c"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
+
+        <img
+          src={uni.image || image}
+          alt={uni.name}
+          className="w-full h-44 object-cover"
+        />
+
+        <div className="p-6">
+          <span
+            className="inline-block text-[10px] font-bold uppercase px-2.5 py-1 rounded-full mb-3"
+            style={{ background: "#fdf3e2", color: "#a4863a" }}
+          >
+            {uni.tag}
+          </span>
+          <h2
+            className="font-display text-xl font-bold"
+            style={{ color: "#1a2a6c" }}
+          >
+            {uni.name}
+          </h2>
+          <p className="text-xs mt-1" style={{ color: "#888" }}>
+            {uni.location}
+          </p>
+          <p className="text-sm mt-4 leading-relaxed" style={{ color: "#555" }}>
+            {uni.description}
+          </p>
+
+          <div className="mt-5 pt-5" style={{ borderTop: "1px solid #f0f2f8" }}>
+            <p
+              className="text-xs font-bold uppercase tracking-wide mb-2"
+              style={{ color: "#c9a84c" }}
+            >
+              Requirements
+            </p>
+            <ul className="space-y-1.5">
+              {uni.requirements.map((r) => (
+                <li
+                  key={r}
+                  className="flex items-start gap-2 text-sm"
+                  style={{ color: "#555" }}
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#0f6e56"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="flex-shrink-0 mt-0.5"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>{r}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div
+            className="flex items-center gap-6 mt-5 pt-5"
+            style={{ borderTop: "1px solid #f0f2f8" }}
+          >
+            <div>
+              <div className="text-xs" style={{ color: "#999" }}>
+                Tuition
+              </div>
+              <div className="text-sm font-bold" style={{ color: "#1a2a6c" }}>
+                {uni.tuition}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs" style={{ color: "#999" }}>
+                Intake
+              </div>
+              <div className="text-sm font-bold" style={{ color: "#1a2a6c" }}>
+                {uni.intake}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={onApply}
+            className="w-full mt-6 py-3 rounded-full text-sm font-bold text-white border-none cursor-pointer"
+            style={{ background: "#b01c2e" }}
+          >
+            Apply Now →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Apply popup — the real application form, embedded ────────────────
+function ApplyModal({ onClose }) {
+  return (
+    <div
+      className="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto py-6 px-4"
+      style={{ background: "rgba(15,23,42,0.6)", backdropFilter: "blur(4px)" }}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="relative w-full max-w-2xl">
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute -top-3 -right-3 z-10 w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-lg border-none cursor-pointer"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1a2a6c"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+        <div className="rounded-2xl overflow-hidden">
+          <ApplicationForm />
+        </div>
       </div>
     </div>
   );
@@ -229,12 +333,17 @@ function UniversityCard({ uni, onApply }) {
 
 export default function Uk() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const applyNow = () => goToApplicationForm(navigate, location.pathname);
+  const [selectedUni, setSelectedUni] = useState(null);
+  const [showApply, setShowApply] = useState(false);
+
+  const openApply = () => {
+    setSelectedUni(null);
+    setShowApply(true);
+  };
 
   return (
     <div className="bg-white">
-      {/* SECTION 1 — HERO */}
+      {/* HERO */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -272,7 +381,7 @@ export default function Uk() {
           </p>
           <div className="flex flex-wrap gap-4">
             <button
-              onClick={applyNow}
+              onClick={openApply}
               className="px-7 py-3 rounded-full text-sm font-bold text-white border-none cursor-pointer"
               style={{ background: "#b01c2e" }}
             >
@@ -288,7 +397,7 @@ export default function Uk() {
         </div>
       </div>
 
-      {/* SECTION 2 — TOP UNIVERSITIES */}
+      {/* TOP UNIVERSITIES */}
       <div className="max-w-6xl mx-auto px-6 py-16 md:py-20">
         <p
           className="text-xs font-bold uppercase tracking-widest mb-3 text-center"
@@ -306,37 +415,38 @@ export default function Uk() {
           className="text-center max-w-xl mx-auto mb-12"
           style={{ color: "#666" }}
         >
-          Entry requirements, tuition and intake at a glance — apply directly to
-          the one that fits you.
+          Tap "Details" for the full picture, or apply directly to the one that
+          fits you.
         </p>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {universities.map((uni) => (
-            <UniversityCard key={uni.id} uni={uni} onApply={applyNow} />
+          {universities.map((uni, i) => (
+            <UniversityCard
+              key={uni.id}
+              uni={uni}
+              image={campusImages[i % campusImages.length]}
+              onDetails={setSelectedUni}
+              onApply={openApply}
+            />
           ))}
         </div>
       </div>
 
-      {/* Closing CTA */}
-      <div className="px-6 py-16 text-center" style={{ background: "#f8f9ff" }}>
-        <h2
-          className="font-display text-2xl md:text-3xl font-bold mb-4"
-          style={{ color: "#1a2a6c" }}
-        >
-          Not Sure Which University Fits You?
-        </h2>
-        <p className="mb-7" style={{ color: "#666" }}>
-          Book a free counseling session and we'll help you shortlist the right
-          one.
-        </p>
-        <button
-          onClick={() => navigate("/contact")}
-          className="px-8 py-3.5 rounded-full text-sm font-bold text-white border-none cursor-pointer"
-          style={{ background: "#b01c2e" }}
-        >
-          Free Counseling
-        </button>
-      </div>
+      {selectedUni && (
+        <DetailsModal
+          uni={selectedUni}
+          image={
+            campusImages[
+              universities.findIndex((u) => u.id === selectedUni.id) %
+                campusImages.length
+            ]
+          }
+          onClose={() => setSelectedUni(null)}
+          onApply={openApply}
+        />
+      )}
+
+      {showApply && <ApplyModal onClose={() => setShowApply(false)} />}
     </div>
   );
 }
