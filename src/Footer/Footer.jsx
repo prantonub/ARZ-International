@@ -355,19 +355,20 @@ const subscribe = async () => {
                   </p>
                 </div>
               ) : (
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && subscribe()}
                     placeholder="Your email address"
-                    className="flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-[#c9a84c] transition-all duration-300"
+                    className="w-full sm:flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-[#c9a84c] transition-all duration-300"
                   />
+
                   <button
                     onClick={subscribe}
                     disabled={subState === "loading"}
-                    className="px-6 py-3 bg-[#b01c2e] hover:bg-[#8b1421] text-white font-bold rounded-lg transition-all duration-300 disabled:opacity-50"
+                    className="w-full sm:w-auto px-6 py-3 bg-[#b01c2e] hover:bg-[#8b1421] text-white font-bold rounded-lg transition-all duration-300 disabled:opacity-50"
                   >
                     {subState === "loading" ? "..." : "Subscribe"}
                   </button>
