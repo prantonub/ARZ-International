@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ApplicationForm from "../../Form/ApplicationForm";
-import australiaImage from "../../assets/southkoria_main.png";
+import australiaImage from "../../assets/australia.jpg";
 
 // Generic campus imagery — clean placeholder university pictures
 const campusImages = [
