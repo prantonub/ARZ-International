@@ -40,31 +40,40 @@ export default function Footer() {
     return () => clearInterval(t);
   }, []);
 
-  const subscribe = async () => {
-    if (!email.includes("@")) return;
-    setSubState("loading");
-    try {
-      const response = await fetch("https://arz-international.vercel.app/api/newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      if (response.ok) {
-        setSubState("done");
-        setEmail("");
-        
-          setTimeout(() => {
-            setSubState("idle");
-          }, 2000);
+const subscribe = async () => {
+  if (!email.trim()) return;
 
-      } else {
-        setSubState("error");
-      }
-    } catch {
+  setSubState("loading");
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/newsletter`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      setSubState("done");
+      setEmail("");
+
+      console.log(result.message);
+
+      setTimeout(() => {
+        setSubState("idle");
+      }, 2000);
+    } else {
+      console.error(result.message);
       setSubState("error");
     }
-  };
-
+  } catch (error) {
+    console.error(error);
+    setSubState("error");
+  }
+};
   const handleApply = () => goToApplicationForm(navigate, location.pathname);
 
   const quickLinks = [
