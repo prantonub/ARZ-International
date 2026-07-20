@@ -1,6 +1,5 @@
 import { Router } from "express";
 import Subscriber from "../models/Subscriber.js";
-import { requireAdmin } from "../middleware/requireAdmin.js";
 
 const router = Router();
 
@@ -26,8 +25,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET /api/newsletter — list subscribers (admin only — requires login)
-router.get("/", requireAdmin, async (req, res) => {
+// GET /api/newsletter — list subscribers
+router.get("/", async (req, res) => {
   try {
     const subscribers = await Subscriber.find().sort({ createdAt: -1 });
     res.json(subscribers);
