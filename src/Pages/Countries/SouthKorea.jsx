@@ -187,7 +187,7 @@ function DetailsModal({ uni, image, onClose, onApply }) {
     >
       <div className="relative bg-white rounded-2xl max-w-lg w-full max-h-[88vh] overflow-y-auto">
         <button
-          onClick={close}
+          onClick={onClose}
           aria-label="Close"
           className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-lg border-none cursor-pointer"
         >
