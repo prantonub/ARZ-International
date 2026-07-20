@@ -12,7 +12,7 @@ const campusImages = [
   "https://images.unsplash.com/photo-1576495199011-eb94736d05d6?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://images.unsplash.com/photo-1692776691970-39dc4edfd870?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1586881141091-1014c7c2cb79?q=80&w=1200&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1542404937-2132aa1fa6fc?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 ];
 // ── University data ──────────────────────────────────────────────────
 // Structured so this array can later be swapped for data fetched from
