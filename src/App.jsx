@@ -19,7 +19,7 @@ function ScrollToTop() {
 // Add or remove paths here — no other file needs to change.
 const HIDE_FOOTER_ON = [
   "/portfolio",
-  "/reviews",
+  "/review",
   "/about",
   "/southkorea",
   "/uk",
