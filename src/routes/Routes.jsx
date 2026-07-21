@@ -6,13 +6,14 @@ import Uk from "../Pages/Countries/Uk";
 import Australia from "../Pages/Countries/Australia";
 import Europe from "../Pages/Countries/Europe";
 import Portfolio from "../Pages/Portfolio/Portfolio";
+import ReviewPage from "../Pages/Review/ReviewPage";
 import About from "../Pages/about/About";
 import Contact from "../Pages/Contact/Contact";
 import PrivacyPolicy from "../Pages/Legal/PrivacyPolicy";
 import TermsOfService from "../Pages/Legal/TermsOfService";
 import CookiePolicy from "../Pages/Legal/CookiePolicy";
 import NotFound from "../Pages/NotFound/NotFound";
-import ReviewPage from "../Pages/Review/ReviewPage";
+import AdminDashboard from "../Pages/Admin/AdminDashboard";
 
 const router = createBrowserRouter([
   {
@@ -21,13 +22,10 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home></Home> },
       { path: "/portfolio", element: <Portfolio></Portfolio> },
+      { path: "/reviews", element: <ReviewPage></ReviewPage> },
       { path: "/about", element: <About></About> },
       { path: "/contact", element: <Contact></Contact> },
-
-      {
-        path: "/review",
-        element: <ReviewPage></ReviewPage>,
-      },
+      { path: "/admin", element: <AdminDashboard></AdminDashboard> },
 
       // Countries — South Korea, UK, Australia, Europe only
       { path: "/southkorea", element: <SouthKorea></SouthKorea> },

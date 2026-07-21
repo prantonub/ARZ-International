@@ -19,24 +19,30 @@ function ScrollToTop() {
 // Add or remove paths here — no other file needs to change.
 const HIDE_FOOTER_ON = [
   "/portfolio",
-  "/review",
+  "/reviews",
   "/about",
   "/southkorea",
   "/uk",
   "/australia",
   "/europe",
+  "/admin",
 ];
+
+// Routes with their own full page layout (own header, own background) —
+// these also hide the public Navbar, not just the Footer.
+const HIDE_CHROME_ON = ["/admin"];
 
 function App() {
   const { pathname } = useLocation();
   const hideFooter = HIDE_FOOTER_ON.includes(pathname);
+  const hideChrome = HIDE_CHROME_ON.includes(pathname);
 
   return (
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
-      <Navbar />
+      {!hideChrome && <Navbar />}
       {/* page-offset compensates for the fixed navbar so content never hides underneath it */}
-      <main className="page-offset flex-1">
+      <main className={hideChrome ? "flex-1" : "page-offset flex-1"}>
         <Outlet />
       </main>
       {!hideFooter && <Footer />}
