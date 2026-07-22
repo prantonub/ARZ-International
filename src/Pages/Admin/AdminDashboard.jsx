@@ -343,26 +343,12 @@ function LoginScreen({ onAuthed }) {
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 border-none bg-transparent cursor-pointer"
             >
               {showPassword ? (
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                   <circle cx="12" cy="12" r="3" />
                 </svg>
               ) : (
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                   <line x1="1" y1="1" x2="23" y2="23" />
                 </svg>
@@ -377,15 +363,7 @@ function LoginScreen({ onAuthed }) {
             className="p-4 rounded-xl mb-5 flex items-start gap-3"
             style={{ background: "#fdeceb", border: "1px solid #fdd9d5" }}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#b01c2e"
-              strokeWidth="2.5"
-              className="mt-0.5 flex-shrink-0"
-            >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b01c2e" strokeWidth="2.5" className="mt-0.5 flex-shrink-0">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -525,8 +503,7 @@ function DatabasePanel({ password }) {
               {tab === "subscribers" && "Newsletter Subscribers"}
             </p>
             <p className="text-xs mt-1" style={{ color: "#999" }}>
-              Total: <strong>{rows.length}</strong> record
-              {rows.length !== 1 ? "s" : ""}
+              Total: <strong>{rows.length}</strong> record{rows.length !== 1 ? "s" : ""}
             </p>
           </div>
 
@@ -591,8 +568,7 @@ function DatabasePanel({ password }) {
             style={{ background: "#f8f9ff", borderTop: "1px solid #eef0f8" }}
           >
             <p className="text-xs" style={{ color: "#999" }}>
-              Showing <strong>{rows.length}</strong> of{" "}
-              <strong>{rows.length}</strong> records
+              Showing <strong>{rows.length}</strong> of <strong>{rows.length}</strong> records
             </p>
           </div>
         </div>
@@ -952,10 +928,7 @@ function UniversitiesPanel({ password }) {
         <EmptyState text={`Couldn't load data: ${error}`} icon="❌" />
       )}
       {!loading && !error && list.length === 0 && (
-        <EmptyState
-          text="No universities added for this country yet."
-          icon="📭"
-        />
+        <EmptyState text="No universities added for this country yet." icon="📭" />
       )}
 
       {!loading && !error && list.length > 0 && (
