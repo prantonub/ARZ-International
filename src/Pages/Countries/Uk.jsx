@@ -2,19 +2,19 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CountryHero, UniversitiesGrid, ApplyModal } from "./CountryPageParts";
 import { apiGet } from "../../config/api";
-import australiaImage from "../../assets/australia.jpg";
+import ukImage from "../../assets/Uk.jpg";
 
 // Generic campus imagery fallback when specific university photo is missing
 const campusImages = [
-  "https://images.unsplash.com/photo-1603437119287-4a3732b685f9?q=80&w=1074&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1670860149444-3f68ef14b6cc?q=80&w=1171&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1572810833916-e5e44570cb2e?q=80&w=1090&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1607714889367-313a76173e20?q=80&w=1494&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1593944117776-784fe294a032?q=80&w=1246&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1721314678234-fb6b27dac858?q=80&w=1126&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1595685833450-b63451efcf01?q=80&w=1229&auto=format&fit=crop",
+  "https://plus.unsplash.com/premium_photo-1754262140581-91752fe8fe01?q=80&w=1171&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=700&q=80",
+  "https://images.unsplash.com/photo-1598058921517-81a452bc7cce?q=80&w=1170&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1586881141091-1014c7c2cb79?q=80&w=1168&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1627742162586-55f1eda05ae9?q=80&w=1170&auto=format&fit=crop",
 ];
 
-export default function Australia() {
+export default function Uk() {
   const navigate = useNavigate();
   const [showApply, setShowApply] = useState(false);
   const [universities, setUniversities] = useState([]);
@@ -24,8 +24,8 @@ export default function Australia() {
     // Reset scroll position to top on page mount
     window.scrollTo(0, 0);
 
-    // Fetch dynamic Australian university data directly from the backend database
-    apiGet("/universities/australia")
+    // Fetch dynamic university data directly from the backend database
+    apiGet("/universities/uk")
       .then((data) => {
         if (Array.isArray(data)) {
           setUniversities(data);
@@ -42,10 +42,10 @@ export default function Australia() {
   return (
     <div className="bg-white min-h-screen">
       <CountryHero
-        flag="au"
-        displayName="Australia"
-        heroImage={australiaImage}
-        tagline="Unlock globally recognized qualifications, flexible part-time work rights, and lucrative post-study work pathways. Australia combines prestigious Group of 8 universities with an unrivaled lifestyle."
+        flag="gb"
+        displayName="the United Kingdom"
+        heroImage={ukImage}
+        tagline="From centuries-old universities to modern career-focused programs, the UK offers a fast track to a globally respected degree — plus two years to work after you graduate."
         onApply={openApply}
         onContact={() => navigate("/contact")}
       />
@@ -53,7 +53,7 @@ export default function Australia() {
       {/* Render grid when university list is loaded from database */}
       {!loading && universities.length > 0 && (
         <UniversitiesGrid
-          sectionTitle="Universities We Work With in Australia"
+          sectionTitle="Universities We Work With in the UK"
           universities={universities}
           campusImages={campusImages}
           onApply={openApply}
@@ -64,8 +64,8 @@ export default function Australia() {
       {!loading && universities.length === 0 && (
         <div className="max-w-2xl mx-auto px-6 py-20 text-center">
           <p style={{ color: "#888" }}>
-            University listings for Australia are being updated — check back
-            soon, or contact us directly.
+            University listings for the UK are being updated — check back soon,
+            or contact us directly.
           </p>
         </div>
       )}
