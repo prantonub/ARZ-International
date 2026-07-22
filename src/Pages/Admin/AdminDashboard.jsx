@@ -9,9 +9,9 @@ const COUNTRIES = [
 ];
 
 const DB_TABS = [
-  { value: "applications", label: "Applications" },
-  { value: "contacts", label: "Contact Messages" },
-  { value: "subscribers", label: "Newsletter Subscribers" },
+  { value: "applications", label: "Applications", icon: "📋" },
+  { value: "contacts", label: "Contact Messages", icon: "✉️" },
+  { value: "subscribers", label: "Newsletter Subscribers", icon: "📧" },
 ];
 
 const NAV_ITEMS = [
@@ -97,48 +97,42 @@ const emptyStoryForm = {
   image: "",
 };
 
-/* ── Small shared UI bits ─────────────────────────────────────────── */
+/* ── Sub Tab ─────────────────────────────────────────────────────── */
 
-function SubTab({ active, onClick, children }) {
+function SubTab({ active, onClick, icon, children }) {
   return (
     <button
       onClick={onClick}
-      className="px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer border-none transition-colors whitespace-nowrap"
+      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer border-none transition-all whitespace-nowrap"
       style={{
         background: active ? "#1a2a6c" : "#fff",
         color: active ? "#fff" : "#555",
         border: active ? "1px solid #1a2a6c" : "1px solid #e5e7f0",
       }}
     >
+      <span>{icon}</span>
       {children}
     </button>
   );
 }
 
-function EmptyState({ text }) {
+/* ── Empty State ─────────────────────────────────────────────────── */
+
+function EmptyState({ text, icon = "📭" }) {
   return (
     <div
-      className="text-center py-20 rounded-2xl"
+      className="text-center py-20 rounded-2xl flex flex-col items-center justify-center"
       style={{ background: "#fff", border: "1px dashed #e5e7f0" }}
     >
-      <svg
-        className="mx-auto mb-3"
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#c7cbe0"
-        strokeWidth="1.5"
-      >
-        <rect x="3" y="3" width="18" height="18" rx="4" />
-        <path d="M8 12h8M12 8v8" />
-      </svg>
+      <div className="text-5xl mb-4">{icon}</div>
       <p className="text-sm" style={{ color: "#999" }}>
         {text}
       </p>
     </div>
   );
 }
+
+/* ── Confirm Delete Button ──────────────────────────────────────── */
 
 function ConfirmDeleteButton({ onConfirm, label = "Delete" }) {
   const [confirming, setConfirming] = useState(false);
@@ -178,51 +172,58 @@ function ConfirmDeleteButton({ onConfirm, label = "Delete" }) {
   );
 }
 
+/* ── Stat Card ────────────────────────────────────────────────────── */
+
 function StatCard({ label, value, icon }) {
   return (
     <div
-      className="rounded-2xl p-5 flex items-center gap-4"
-      style={{ background: "#fff", border: "1px solid #eef0f8" }}
+      className="rounded-2xl p-6"
+      style={{
+        background: "#fff",
+        border: "1px solid #eef0f8",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+      }}
     >
-      <div
-        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-        style={{ background: "#f0f2ff", color: "#1a2a6c" }}
-      >
-        {icon}
-      </div>
-      <div>
-        <div
-          className="font-display font-bold text-2xl leading-none"
-          style={{ color: "#1a2a6c" }}
-        >
-          {value}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="text-xs font-semibold mb-2" style={{ color: "#999" }}>
+            {label}
+          </div>
+          <div
+            className="font-display font-bold text-3xl"
+            style={{ color: "#1a2a6c" }}
+          >
+            {value}
+          </div>
         </div>
-        <div className="text-xs mt-1.5" style={{ color: "#999" }}>
-          {label}
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
+          style={{ background: "#f0f2ff", color: "#1a2a6c" }}
+        >
+          {icon}
         </div>
       </div>
     </div>
   );
 }
 
-/* ── Login screen ─────────────────────────────────────────────────── */
+/* ── Login Screen with Background ────────────────────────────────── */
 
 function LoginScreen({ onAuthed }) {
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
     setChecking(true);
     setError("");
     try {
-      // Only the password is actually checked by the server —
-      // username is stored for display only ("Logged in as ...").
+      // Username is hardcoded as "admin"
       await adminRequest("/admin/applications", password);
       sessionStorage.setItem("arz_admin_password", password);
-      sessionStorage.setItem("arz_admin_username", username || "Admin");
+      sessionStorage.setItem("arz_admin_username", "admin");
       onAuthed(password);
     } catch (err) {
       setError(err.message || "Incorrect password.");
@@ -234,46 +235,47 @@ function LoginScreen({ onAuthed }) {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
-      style={{ background: "#0f1730" }}
+      style={{
+        background: `linear-gradient(135deg, rgba(26, 42, 108, 0.9), rgba(43, 61, 143, 0.9)), 
+                    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.05)" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,144C960,149,1056,139,1152,128C1248,117,1344,107,1392,101.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
     >
+      {/* Floating decorative elements */}
       <div
-        className="absolute rounded-full blur-3xl pointer-events-none"
+        className="absolute top-10 left-10 w-20 h-20 rounded-full opacity-10"
         style={{
-          width: 420,
-          height: 420,
-          top: "-10%",
-          left: "-8%",
-          background:
-            "radial-gradient(circle, rgba(201,168,76,0.12), transparent 70%)",
+          background: "#c9a84c",
+          filter: "blur(40px)",
         }}
       />
       <div
-        className="absolute rounded-full blur-3xl pointer-events-none"
+        className="absolute bottom-20 right-10 w-32 h-32 rounded-full opacity-10"
         style={{
-          width: 380,
-          height: 380,
-          bottom: "-12%",
-          right: "-6%",
-          background:
-            "radial-gradient(circle, rgba(26,42,108,0.35), transparent 70%)",
+          background: "#b01c2e",
+          filter: "blur(50px)",
         }}
       />
 
       <form
         onSubmit={submit}
-        className="relative w-full max-w-sm rounded-2xl p-8"
+        className="relative w-full max-w-sm rounded-3xl p-8"
         style={{
           background: "#fff",
-          boxShadow: "0 30px 70px -20px rgba(0,0,0,0.5)",
+          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+          backdropFilter: "blur(10px)",
         }}
       >
+        {/* Logo */}
         <div
-          className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+          className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 mx-auto"
           style={{ background: "linear-gradient(135deg, #1a2a6c, #2b3d8f)" }}
         >
           <svg
-            width="22"
-            height="22"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             stroke="#fff"
@@ -285,81 +287,139 @@ function LoginScreen({ onAuthed }) {
             <path d="M6 12v5c3 3 9 3 12 0v-5" />
           </svg>
         </div>
-        <h1
-          className="font-display text-xl font-bold mb-1"
-          style={{ color: "#1a2a6c" }}
-        >
-          Admin Dashboard
-        </h1>
-        <p className="text-sm mb-6" style={{ color: "#888" }}>
-          ARZ International — sign in to continue.
-        </p>
 
-        <label
-          className="block text-xs font-bold uppercase mb-1.5"
-          style={{ color: "#888" }}
-        >
-          Username
-        </label>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="admin"
-          autoFocus
-          className="w-full px-4 py-2.5 rounded-xl text-sm outline-none mb-4 transition-colors"
-          style={{ border: "1.5px solid #e5e7f0" }}
-        />
+        <div className="text-center mb-8">
+          <h1
+            className="font-display text-2xl font-bold mb-2"
+            style={{ color: "#1a2a6c" }}
+          >
+            Admin Dashboard
+          </h1>
+          <p className="text-sm" style={{ color: "#888" }}>
+            ARZ International
+          </p>
+        </div>
 
-        <label
-          className="block text-xs font-bold uppercase mb-1.5"
-          style={{ color: "#888" }}
-        >
-          Password
-        </label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-          className="w-full px-4 py-2.5 rounded-xl text-sm outline-none mb-2 transition-colors"
-          style={{ border: "1.5px solid #e5e7f0" }}
-        />
+        {/* Username (display only) */}
+        <div className="mb-5">
+          <label
+            className="block text-xs font-bold uppercase mb-2"
+            style={{ color: "#888" }}
+          >
+            Username
+          </label>
+          <input
+            type="text"
+            value="admin"
+            disabled
+            className="w-full px-4 py-3 rounded-xl text-sm outline-none bg-gray-100 cursor-not-allowed"
+            style={{ border: "1.5px solid #e5e7f0", color: "#999" }}
+          />
+        </div>
 
+        {/* Password */}
+        <div className="mb-6">
+          <label
+            className="block text-xs font-bold uppercase mb-2"
+            style={{ color: "#888" }}
+          >
+            Password
+          </label>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              autoFocus
+              className="w-full px-4 py-3 rounded-xl text-sm outline-none pr-10 transition-colors"
+              style={{
+                border: "1.5px solid #e5e7f0",
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 border-none bg-transparent cursor-pointer"
+            >
+              {showPassword ? (
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              ) : (
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Error Message */}
         {error && (
-          <p
-            className="text-sm mt-2 mb-1 flex items-center gap-1.5"
-            style={{ color: "#b01c2e" }}
+          <div
+            className="p-4 rounded-xl mb-5 flex items-start gap-3"
+            style={{ background: "#fdeceb", border: "1px solid #fdd9d5" }}
           >
             <svg
-              width="14"
-              height="14"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
+              stroke="#b01c2e"
+              strokeWidth="2.5"
+              className="mt-0.5 flex-shrink-0"
             >
               <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v4M12 16h.01" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            {error}
-          </p>
+            <p className="text-sm" style={{ color: "#b01c2e" }}>
+              {error}
+            </p>
+          </div>
         )}
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={checking || !password}
-          className="w-full py-3 mt-4 rounded-xl text-sm font-bold text-white border-none cursor-pointer disabled:opacity-60 transition-opacity"
-          style={{ background: "#1a2a6c" }}
+          className="w-full py-3 rounded-xl text-sm font-bold text-white border-none cursor-pointer transition-all disabled:opacity-60 hover:shadow-lg"
+          style={{
+            background: checking
+              ? "#1a2a6c"
+              : "linear-gradient(135deg, #1a2a6c, #2b3d8f)",
+          }}
         >
-          {checking ? "Signing in..." : "Sign In"}
+          {checking ? "Verifying..." : "Sign In"}
         </button>
+
+        {/* Footer */}
+        <p className="text-xs text-center mt-6" style={{ color: "#999" }}>
+          Protected admin area. Access restricted to authorized personnel only.
+        </p>
       </form>
     </div>
   );
 }
 
-/* ── Database tab — read-only tables (same fetch logic, new look) ──── */
+/* ── Database Panel with Improved Table Design ──────────────────── */
 
 function DatabasePanel({ password }) {
   const [tab, setTab] = useState("applications");
@@ -390,7 +450,6 @@ function DatabasePanel({ password }) {
     };
   }, [tab, password]);
 
-  // Fetch counts for the two tabs not currently active, just for the stat cards.
   useEffect(() => {
     DB_TABS.forEach((t) => {
       if (t.value === tab || counts[t.value] !== undefined) return;
@@ -398,8 +457,7 @@ function DatabasePanel({ password }) {
         .then((data) => setCounts((c) => ({ ...c, [t.value]: data.length })))
         .catch(() => {});
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab]);
+  }, [tab, password, counts]);
 
   const columns = rows[0]
     ? Object.keys(rows[0]).filter((k) => k !== "__v")
@@ -407,138 +465,143 @@ function DatabasePanel({ password }) {
 
   return (
     <div>
-      <div className="grid sm:grid-cols-3 gap-4 mb-8">
+      {/* Stat Cards */}
+      <div className="grid sm:grid-cols-3 gap-6 mb-8">
         <StatCard
           label="Applications"
           value={counts.applications ?? "—"}
-          icon={
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-              <path d="M14 2v6h6" />
-            </svg>
-          }
+          icon="📋"
         />
         <StatCard
           label="Contact Messages"
           value={counts.contacts ?? "—"}
-          icon={
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-            </svg>
-          }
+          icon="✉️"
         />
         <StatCard
           label="Newsletter Subscribers"
           value={counts.subscribers ?? "—"}
-          icon={
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              <path d="M4 4h16v16H4z" />
-              <path d="M4 6l8 7 8-7" />
-            </svg>
-          }
+          icon="📧"
         />
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-5">
+      {/* Tab Navigation */}
+      <div className="flex flex-wrap gap-2 mb-6">
         {DB_TABS.map((t) => (
           <SubTab
             key={t.value}
             active={tab === t.value}
             onClick={() => setTab(t.value)}
+            icon={t.icon}
           >
             {t.label}
           </SubTab>
         ))}
       </div>
 
-      {loading && <EmptyState text="Loading..." />}
-      {!loading && error && (
-        <EmptyState text={`Couldn't load data: ${error}`} />
-      )}
+      {/* Content */}
+      {loading && <EmptyState text="Loading records..." icon="⏳" />}
+      {!loading && error && <EmptyState text={`Error: ${error}`} icon="❌" />}
       {!loading && !error && rows.length === 0 && (
-        <EmptyState text="No records yet." />
+        <EmptyState text="No records found" icon="📭" />
       )}
 
       {!loading && !error && rows.length > 0 && (
         <div
-          className="overflow-x-auto rounded-2xl"
-          style={{ background: "#fff", border: "1px solid #eef0f8" }}
+          className="rounded-2xl overflow-hidden"
+          style={{
+            background: "#fff",
+            border: "1px solid #eef0f8",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+          }}
         >
-          <table
-            className="w-full text-xs"
-            style={{ borderCollapse: "collapse" }}
+          {/* Header with info */}
+          <div
+            className="px-6 py-4 border-b"
+            style={{ borderColor: "#eef0f8", background: "#f8f9ff" }}
           >
-            <thead>
-              <tr style={{ background: "#f8f9ff" }}>
-                {columns.map((col) => (
-                  <th
-                    key={col}
-                    className="text-left px-4 py-3.5 font-bold uppercase whitespace-nowrap tracking-wide"
-                    style={{
-                      color: "#1a2a6c",
-                      borderBottom: "1px solid #eef0f8",
-                      fontSize: "10px",
-                      letterSpacing: "0.06em",
-                    }}
-                  >
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, i) => (
-                <tr
-                  key={row._id}
-                  style={{ background: i % 2 === 1 ? "#fbfbfe" : "#fff" }}
-                >
+            <p className="text-sm font-semibold" style={{ color: "#1a2a6c" }}>
+              {tab === "applications" && "All Applications"}
+              {tab === "contacts" && "Contact Messages"}
+              {tab === "subscribers" && "Newsletter Subscribers"}
+            </p>
+            <p className="text-xs mt-1" style={{ color: "#999" }}>
+              Total: <strong>{rows.length}</strong> record
+              {rows.length !== 1 ? "s" : ""}
+            </p>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr style={{ background: "#fafbfc" }}>
                   {columns.map((col) => (
-                    <td
+                    <th
                       key={col}
-                      className="px-4 py-3 whitespace-nowrap"
+                      className="text-left px-6 py-4 font-semibold whitespace-nowrap"
                       style={{
-                        color: "#444",
-                        borderBottom: "1px solid #f5f6fa",
-                        maxWidth: "260px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
+                        color: "#1a2a6c",
+                        fontSize: "12px",
+                        letterSpacing: "0.04em",
+                        textTransform: "uppercase",
+                        fontWeight: 600,
+                        borderBottom: "2px solid #eef0f8",
                       }}
                     >
-                      {String(row[col] ?? "")}
-                    </td>
+                      {col}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {rows.map((row, idx) => (
+                  <tr
+                    key={row._id || idx}
+                    className="hover:bg-blue-50 transition-colors"
+                    style={{
+                      background: idx % 2 === 0 ? "#fff" : "#fbfbfe",
+                      borderBottom: "1px solid #eef0f8",
+                    }}
+                  >
+                    {columns.map((col) => (
+                      <td
+                        key={col}
+                        className="px-6 py-4 text-sm"
+                        style={{
+                          color: "#555",
+                          maxWidth: "300px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                        title={String(row[col] ?? "")}
+                      >
+                        {String(row[col] ?? "—")}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Footer */}
+          <div
+            className="px-6 py-4"
+            style={{ background: "#f8f9ff", borderTop: "1px solid #eef0f8" }}
+          >
+            <p className="text-xs" style={{ color: "#999" }}>
+              Showing <strong>{rows.length}</strong> of{" "}
+              <strong>{rows.length}</strong> records
+            </p>
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-/* ── University add/edit form (modal with File Upload) — same logic ── */
+/* ── University Form Modal ──────────────────────────────────────── */
 
 function UniversityFormModal({ country, editing, password, onClose, onSaved }) {
   const [form, setForm] = useState(
@@ -811,7 +874,7 @@ function UniversityFormModal({ country, editing, password, onClose, onSaved }) {
   );
 }
 
-/* ── Universities tab — same fetch/delete logic, new look ──────────── */
+/* ── Universities Panel ─────────────────────────────────────────── */
 
 function UniversitiesPanel({ password }) {
   const [country, setCountry] = useState("south-korea");
@@ -850,15 +913,14 @@ function UniversitiesPanel({ password }) {
               key={c.value}
               active={country === c.value}
               onClick={() => setCountry(c.value)}
+              icon={`https://flagcdn.com/w20/${c.flag}.png`}
             >
-              <span className="inline-flex items-center gap-1.5">
-                <img
-                  src={`https://flagcdn.com/w20/${c.flag}.png`}
-                  alt=""
-                  className="w-3.5 h-2.5 rounded-sm object-cover"
-                />
-                {c.label}
-              </span>
+              <img
+                src={`https://flagcdn.com/w20/${c.flag}.png`}
+                alt=""
+                className="w-3.5 h-2.5 rounded-sm object-cover"
+              />
+              {c.label}
             </SubTab>
           ))}
         </div>
@@ -885,12 +947,15 @@ function UniversitiesPanel({ password }) {
         </button>
       </div>
 
-      {loading && <EmptyState text="Loading..." />}
+      {loading && <EmptyState text="Loading..." icon="🎓" />}
       {!loading && error && (
-        <EmptyState text={`Couldn't load data: ${error}`} />
+        <EmptyState text={`Couldn't load data: ${error}`} icon="❌" />
       )}
       {!loading && !error && list.length === 0 && (
-        <EmptyState text="No universities added for this country yet." />
+        <EmptyState
+          text="No universities added for this country yet."
+          icon="📭"
+        />
       )}
 
       {!loading && !error && list.length > 0 && (
@@ -898,7 +963,7 @@ function UniversitiesPanel({ password }) {
           {list.map((uni) => (
             <div
               key={uni._id}
-              className="rounded-2xl overflow-hidden transition-shadow duration-200 hover:shadow-lg"
+              className="rounded-2xl overflow-hidden transition-all hover:shadow-lg"
               style={{ background: "#fff", border: "1px solid #eef0f8" }}
             >
               <div
@@ -979,7 +1044,7 @@ function UniversitiesPanel({ password }) {
   );
 }
 
-/* ── Success story add/edit form (modal) — same logic ────────────── */
+/* ── Story Form Modal ───────────────────────────────────────────── */
 
 function StoryFormModal({ editing, password, onClose, onSaved }) {
   const [form, setForm] = useState(editing || emptyStoryForm);
@@ -1237,7 +1302,7 @@ function StoryFormModal({ editing, password, onClose, onSaved }) {
   );
 }
 
-/* ── Success Stories tab — same fetch/delete logic, new look ───────── */
+/* ── Stories Panel ──────────────────────────────────────────────── */
 
 function StoriesPanel({ password }) {
   const [list, setList] = useState([]);
@@ -1297,12 +1362,12 @@ function StoriesPanel({ password }) {
         </button>
       </div>
 
-      {loading && <EmptyState text="Loading..." />}
+      {loading && <EmptyState text="Loading..." icon="⭐" />}
       {!loading && error && (
-        <EmptyState text={`Couldn't load data: ${error}`} />
+        <EmptyState text={`Couldn't load data: ${error}`} icon="❌" />
       )}
       {!loading && !error && list.length === 0 && (
-        <EmptyState text="No success stories added yet." />
+        <EmptyState text="No success stories added yet." icon="📭" />
       )}
 
       {!loading && !error && list.length > 0 && (
@@ -1310,7 +1375,7 @@ function StoriesPanel({ password }) {
           {list.map((story) => (
             <div
               key={story._id}
-              className="rounded-2xl overflow-hidden transition-shadow duration-200 hover:shadow-lg"
+              className="rounded-2xl overflow-hidden transition-all hover:shadow-lg"
               style={{ background: "#fff", border: "1px solid #eef0f8" }}
             >
               <div
@@ -1386,19 +1451,16 @@ function StoriesPanel({ password }) {
   );
 }
 
-/* ── Page shell — sidebar layout ─────────────────────────────────── */
+/* ── Main Dashboard ────────────────────────────────────────────── */
 
 export default function AdminDashboard() {
   const [password, setPassword] = useState(null);
-  const [username, setUsername] = useState("Admin");
   const [tab, setTab] = useState("database");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     const savedPassword = sessionStorage.getItem("arz_admin_password");
-    const savedUsername = sessionStorage.getItem("arz_admin_username");
     if (savedPassword) setPassword(savedPassword);
-    if (savedUsername) setUsername(savedUsername);
   }, []);
 
   if (!password) {
@@ -1476,11 +1538,11 @@ export default function AdminDashboard() {
               className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs text-white"
               style={{ background: "#c9a84c" }}
             >
-              {username.slice(0, 1).toUpperCase()}
+              A
             </div>
             <div className="min-w-0">
               <div className="text-xs font-semibold text-white truncate">
-                {username}
+                admin
               </div>
               <div className="text-[10px]" style={{ color: "#8892b0" }}>
                 Administrator
@@ -1511,7 +1573,7 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
-      {/* MOBILE TOP BAR + DRAWER */}
+      {/* MOBILE TOP BAR */}
       <div
         className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3"
         style={{ background: "#0f1730" }}
