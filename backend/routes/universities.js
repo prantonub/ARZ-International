@@ -37,6 +37,7 @@ router.get("/:country", async (req, res) => {
 router.post("/", upload.single("image"), async (req, res) => {
   if (!isAdmin(req))
     return res.status(401).json({ message: "Incorrect admin password." });
+
   try {
     let imageUrl = req.body.image || "";
 
@@ -45,23 +46,52 @@ router.post("/", upload.single("image"), async (req, res) => {
       imageUrl = result.secure_url;
     }
 
-    const uniData = { ...req.body, image: imageUrl };
+    // Requirements string hisebe asle Array te convert korbe
+    let reqs = req.body.requirements;
+    if (typeof reqs === "string") {
+      try {
+        reqs = JSON.parse(reqs);
+      } catch (e) {
+        reqs = reqs.split(",").map((r) => r.trim());
+      }
+    }
+
+    const uniData = {
+      ...req.body,
+      image: imageUrl,
+      requirements: reqs || [],
+    };
+
     const uni = await University.create(uniData);
     res.status(201).json(uni);
   } catch (err) {
-    res.status(500).json({ message: "Couldn't create university." });
+    console.error("POST /universities error:", err); // Render terminal-e exact error dekhabe
+    res
+      .status(500)
+      .json({ message: "Couldn't create university.", error: err.message });
   }
 });
 
 router.put("/:id", upload.single("image"), async (req, res) => {
   if (!isAdmin(req))
     return res.status(401).json({ message: "Incorrect admin password." });
+
   try {
     let updateData = { ...req.body };
 
     if (req.file) {
       const result = await uploadToCloudinary(req.file.buffer);
       updateData.image = result.secure_url;
+    }
+
+    if (typeof updateData.requirements === "string") {
+      try {
+        updateData.requirements = JSON.parse(updateData.requirements);
+      } catch (e) {
+        updateData.requirements = updateData.requirements
+          .split(",")
+          .map((r) => r.trim());
+      }
     }
 
     const uni = await University.findByIdAndUpdate(req.params.id, updateData, {
@@ -71,13 +101,17 @@ router.put("/:id", upload.single("image"), async (req, res) => {
     if (!uni) return res.status(404).json({ message: "University not found." });
     res.json(uni);
   } catch (err) {
-    res.status(500).json({ message: "Couldn't update university." });
+    console.error("PUT /universities error:", err);
+    res
+      .status(500)
+      .json({ message: "Couldn't update university.", error: err.message });
   }
 });
 
 router.delete("/:id", async (req, res) => {
   if (!isAdmin(req))
     return res.status(401).json({ message: "Incorrect admin password." });
+
   try {
     const deleted = await University.findByIdAndDelete(req.params.id);
     if (!deleted)
