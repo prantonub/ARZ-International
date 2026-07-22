@@ -664,96 +664,96 @@ function LoginScreen({ onAuthed }) {
     }
   };
 
-  return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4"
+return (
+  <div
+    className="min-h-screen flex items-center justify-center px-4 bg-cover bg-center bg-no-repeat"
+    style={{
+      backgroundImage:
+        "url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+    }}
+  >
+    <form
+      onSubmit={submit}
+      className="w-full max-w-sm rounded-2xl p-8"
       style={{
-        background:
-          "linear-gradient(160deg, #f6f7fb 0%, #eef0f8 45%, #f5eee1 100%)",
+        background: "#fff",
+        boxShadow: "0 25px 60px -20px rgba(15,23,42,0.25)",
       }}
     >
-      <form
-        onSubmit={submit}
-        className="w-full max-w-sm rounded-2xl p-8"
+      <div
+        className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
         style={{
-          background: "#fff",
-          boxShadow: "0 25px 60px -20px rgba(15,23,42,0.25)",
+          background: `linear-gradient(135deg, ${BRAND.navy}, ${BRAND.navySoft})`,
         }}
       >
-        <div
-          className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-          style={{
-            background: `linear-gradient(135deg, ${BRAND.navy}, ${BRAND.navySoft})`,
-          }}
-        >
-          <GraduationCap size={22} color="#fff" strokeWidth={2} />
-        </div>
-        <h1
-          className="font-display text-xl font-bold mb-1"
-          style={{ color: BRAND.navy }}
-        >
-          Admin Dashboard
-        </h1>
-        <p className="text-sm mb-6" style={{ color: "#888" }}>
-          ARZ International — sign in to continue.
-        </p>
+        <GraduationCap size={22} color="#fff" strokeWidth={2} />
+      </div>
+      <h1
+        className="font-display text-xl font-bold mb-1"
+        style={{ color: BRAND.navy }}
+      >
+        Admin Dashboard
+      </h1>
+      <p className="text-sm mb-6" style={{ color: "#888" }}>
+        ARZ International — sign in to continue.
+      </p>
 
-        <div className="space-y-4">
-          <Field label="Username">
+      <div className="space-y-4">
+        <Field label="Username">
+          <TextInput
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="admin"
+            autoFocus
+          />
+        </Field>
+
+        <Field label="Password">
+          <div className="relative">
             <TextInput
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="admin"
-              autoFocus
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="pr-11"
             />
-          </Field>
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 border-none bg-transparent cursor-pointer p-1"
+              style={{ color: "#aaa" }}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+        </Field>
+      </div>
 
-          <Field label="Password">
-            <div className="relative">
-              <TextInput
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="pr-11"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 border-none bg-transparent cursor-pointer p-1"
-                style={{ color: "#aaa" }}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </Field>
-        </div>
-
-        {error && (
-          <p
-            className="text-sm mt-4 flex items-center gap-1.5"
-            style={{ color: BRAND.crimson }}
-          >
-            <AlertCircle size={14} />
-            {error}
-          </p>
-        )}
-
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          loading={checking}
-          disabled={!password}
-          className="w-full mt-6 hover:-translate-y-0.5"
+      {error && (
+        <p
+          className="text-sm mt-4 flex items-center gap-1.5"
+          style={{ color: BRAND.crimson }}
         >
-          {checking ? "Signing in..." : "Sign In"}
-        </Button>
-      </form>
-    </div>
-  );
+          <AlertCircle size={14} />
+          {error}
+        </p>
+      )}
+
+      <Button
+        type="submit"
+        variant="primary"
+        size="lg"
+        loading={checking}
+        disabled={!password}
+        className="w-full mt-6 hover:-translate-y-0.5"
+      >
+        {checking ? "Signing in..." : "Sign In"}
+      </Button>
+    </form>
+  </div>
+);
 }
 
 /* ── Sticky top navbar ────────────────────────────────────────────── */
