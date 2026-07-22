@@ -112,7 +112,6 @@ function PasswordGate({ onAuthed }) {
     setChecking(true);
     setError("");
     try {
-      // Try one protected endpoint — if it succeeds, the password is correct.
       await adminRequest("/admin/applications", password);
       sessionStorage.setItem("arz_admin_password", password);
       onAuthed(password);
@@ -172,7 +171,7 @@ function PasswordGate({ onAuthed }) {
   );
 }
 
-/* ── Database tab — read-only tables for applications/contacts/subscribers ── */
+/* ── Database tab — read-only tables ─────────────────────────────── */
 
 function DatabasePanel({ password }) {
   const [tab, setTab] = useState("applications");
@@ -278,7 +277,7 @@ function DatabasePanel({ password }) {
   );
 }
 
-/* ── University add/edit form (modal) ────────────────────────────── */
+/* ── University add/edit form (modal with File Upload) ───────────── */
 
 function UniversityFormModal({ country, editing, password, onClose, onSaved }) {
   const [form, setForm] = useState(
@@ -289,6 +288,7 @@ function UniversityFormModal({ country, editing, password, onClose, onSaved }) {
         }
       : emptyUniForm,
   );
+  const [imageFile, setImageFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -302,32 +302,38 @@ function UniversityFormModal({ country, editing, password, onClose, onSaved }) {
     }
     setSaving(true);
     setError("");
-    const payload = {
-      country,
-      name: form.name,
-      location: form.location,
-      tag: form.tag,
-      image: form.image,
-      description: form.description,
-      tuition: form.tuition,
-      intake: form.intake,
-      requirements: form.requirementsText
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean),
-    };
+
+    const formData = new FormData();
+    formData.append("country", country);
+    formData.append("name", form.name);
+    formData.append("location", form.location || "");
+    formData.append("tag", form.tag || "");
+    formData.append("description", form.description || "");
+    formData.append("tuition", form.tuition || "");
+    formData.append("intake", form.intake || "");
+
+    const reqs = form.requirementsText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    reqs.forEach((r) => formData.append("requirements", r));
+
+    if (imageFile) {
+      formData.append("image", imageFile);
+    } else if (form.image) {
+      formData.append("image", form.image);
+    }
+
     try {
-      if (editing) {
-        await adminRequest(`/universities/${editing._id}`, password, {
-          method: "PUT",
-          body: payload,
-        });
-      } else {
-        await adminRequest("/universities", password, {
-          method: "POST",
-          body: payload,
-        });
-      }
+      const url = editing ? `/universities/${editing._id}` : "/universities";
+      const method = editing ? "PUT" : "POST";
+
+      await adminRequest(url, password, {
+        method,
+        body: formData,
+      });
+
       onSaved();
     } catch (err) {
       setError(err.message || "Couldn't save university.");
@@ -397,21 +403,34 @@ function UniversityFormModal({ country, editing, password, onClose, onSaved }) {
               />
             </div>
           </div>
+
+          {/* Upload or Image URL */}
           <div>
             <label
               className="block text-xs font-bold uppercase mb-1"
               style={{ color: "#888" }}
             >
-              Image URL
+              Upload Image File (Cloudinary)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files[0])}
+              className="w-full text-xs p-1 mb-2"
+            />
+
+            <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+              OR Image URL
             </label>
             <input
               value={form.image}
               onChange={(e) => update("image", e.target.value)}
-              placeholder="Leave blank to use a generic photo"
+              placeholder="Paste direct image link"
               className="w-full px-3 py-2 rounded-lg text-sm outline-none"
               style={{ border: "1.5px solid #e5e7f0" }}
             />
           </div>
+
           <div>
             <label
               className="block text-xs font-bold uppercase mb-1"

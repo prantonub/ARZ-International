@@ -1,10 +1,9 @@
 import { Router } from "express";
 import University from "../models/University.js";
+import { upload, uploadToCloudinary } from "../config/cloudinary.js";
 
 const router = Router();
 
-// Self-contained admin check — no separate file to import, so a typo or
-// missing file can never crash the whole server the way it did before.
 function isAdmin(req) {
   return (
     Boolean(process.env.ADMIN_PASSWORD) &&
@@ -12,9 +11,6 @@ function isAdmin(req) {
   );
 }
 
-// GET /api/universities — public: every university, across all countries
-// (used by the admin dashboard's own tables; not sensitive data — it's
-// exactly what's already shown publicly on the country pages)
 router.get("/", async (req, res) => {
   try {
     const universities = await University.find().sort({
@@ -27,8 +23,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/universities/:country — public: universities for one country
-// (used by the South Korea / UK / Australia / Europe pages)
 router.get("/:country", async (req, res) => {
   try {
     const universities = await University.find({
@@ -40,24 +34,37 @@ router.get("/:country", async (req, res) => {
   }
 });
 
-// POST /api/universities — admin only: create
-router.post("/", async (req, res) => {
+router.post("/", upload.single("image"), async (req, res) => {
   if (!isAdmin(req))
     return res.status(401).json({ message: "Incorrect admin password." });
   try {
-    const uni = await University.create(req.body);
+    let imageUrl = req.body.image || "";
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      imageUrl = result.secure_url;
+    }
+
+    const uniData = { ...req.body, image: imageUrl };
+    const uni = await University.create(uniData);
     res.status(201).json(uni);
   } catch (err) {
     res.status(500).json({ message: "Couldn't create university." });
   }
 });
 
-// PUT /api/universities/:id — admin only: update
-router.put("/:id", async (req, res) => {
+router.put("/:id", upload.single("image"), async (req, res) => {
   if (!isAdmin(req))
     return res.status(401).json({ message: "Incorrect admin password." });
   try {
-    const uni = await University.findByIdAndUpdate(req.params.id, req.body, {
+    let updateData = { ...req.body };
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      updateData.image = result.secure_url;
+    }
+
+    const uni = await University.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
     });
@@ -68,7 +75,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE /api/universities/:id — admin only: delete
 router.delete("/:id", async (req, res) => {
   if (!isAdmin(req))
     return res.status(401).json({ message: "Incorrect admin password." });

@@ -33,31 +33,50 @@ export async function apiGet(path) {
  * a friendly message instead of a raw network error.
  */
 export async function apiPost(path, body) {
+  const isFormData = body instanceof FormData;
+
+  const headers = {};
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    headers,
+    body: isFormData ? body : JSON.stringify(body),
   });
   return handleResponse(res);
 }
 
 /**
- * Admin-authenticated request. The admin password is sent as a header on
- * every call and checked by the backend each time — no login session or
- * token involved, just a shared password gate on the write endpoints.
+ * Admin-authenticated request. Supports both JSON and FormData body.
+ * Automatically avoids setting Content-Type for FormData so browser can set boundary.
  */
 export async function adminRequest(
   path,
   password,
   { method = "GET", body } = {},
 ) {
+  const isFormData = body instanceof FormData;
+
+  const headers = {
+    "x-admin-password": password,
+  };
+
+  // Only set Content-Type if it's NOT a FormData upload
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      "x-admin-password": password,
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    headers,
+    body:
+      body !== undefined
+        ? isFormData
+          ? body
+          : JSON.stringify(body)
+        : undefined,
   });
   return handleResponse(res);
 }
