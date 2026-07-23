@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import "@fontsource/inter";
 import { apiGet, adminRequest } from "../../config/api";
 import {
   Database,
