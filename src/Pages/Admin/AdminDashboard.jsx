@@ -301,7 +301,7 @@ function ConfirmModal({
           <AlertCircle size={20} />
         </div>
         <h3
-          className="font-display font-bold text-base mb-1.5"
+          className="font-bold text-base mb-1.5"
           style={{ color: BRAND.navy }}
         >
           {title}
@@ -362,7 +362,7 @@ function StatCard({
           <Skeleton className="h-7 w-16 mb-1.5" />
         ) : (
           <div
-            className={`font-display font-bold ${valueClassName} leading-none truncate`}
+            className={`font-bold ${valueClassName} leading-none truncate`}
             style={{ color: BRAND.navy }}
           >
             {value}
@@ -599,10 +599,7 @@ function RecordDetailModal({ row, onClose }) {
         style={{ boxShadow: "0 30px 70px -20px rgba(0,0,0,0.4)" }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h3
-            className="font-display font-bold text-base"
-            style={{ color: BRAND.navy }}
-          >
+          <h3 className="font-bold text-base" style={{ color: BRAND.navy }}>
             Record Details
           </h3>
           <button
@@ -665,96 +662,94 @@ function LoginScreen({ onAuthed }) {
     }
   };
 
-return (
-  <div
-    className="min-h-screen flex items-center justify-center px-4 bg-cover bg-center bg-no-repeat"
-    style={{
-      backgroundImage:
-        "url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
-    }}
-  >
-    <form
-      onSubmit={submit}
-      className="w-full max-w-sm rounded-2xl p-8"
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center px-4 bg-cover bg-center bg-no-repeat"
       style={{
-        background: "#fff",
-        boxShadow: "0 25px 60px -20px rgba(15,23,42,0.25)",
+        fontFamily: "'Inter', sans-serif",
+        backgroundImage:
+          "url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
       }}
     >
-      <div
-        className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+      <form
+        onSubmit={submit}
+        className="w-full max-w-sm rounded-2xl p-8"
         style={{
-          background: `linear-gradient(135deg, ${BRAND.navy}, ${BRAND.navySoft})`,
+          background: "#fff",
+          boxShadow: "0 25px 60px -20px rgba(15,23,42,0.25)",
         }}
       >
-        <GraduationCap size={22} color="#fff" strokeWidth={2} />
-      </div>
-      <h1
-        className="font-display text-xl font-bold mb-1"
-        style={{ color: BRAND.navy }}
-      >
-        Admin Dashboard
-      </h1>
-      <p className="text-sm mb-6" style={{ color: "#888" }}>
-        ARZ International — sign in to continue.
-      </p>
-
-      <div className="space-y-4">
-        <Field label="Username">
-          <TextInput
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="admin"
-            autoFocus
-          />
-        </Field>
-
-        <Field label="Password">
-          <div className="relative">
-            <TextInput
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="pr-11"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 border-none bg-transparent cursor-pointer p-1"
-              style={{ color: "#aaa" }}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
-          </div>
-        </Field>
-      </div>
-
-      {error && (
-        <p
-          className="text-sm mt-4 flex items-center gap-1.5"
-          style={{ color: BRAND.crimson }}
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+          style={{
+            background: `linear-gradient(135deg, ${BRAND.navy}, ${BRAND.navySoft})`,
+          }}
         >
-          <AlertCircle size={14} />
-          {error}
+          <GraduationCap size={22} color="#fff" strokeWidth={2} />
+        </div>
+        <h1 className="text-xl font-bold mb-1" style={{ color: BRAND.navy }}>
+          Admin Dashboard
+        </h1>
+        <p className="text-sm mb-6" style={{ color: "#888" }}>
+          ARZ International — sign in to continue.
         </p>
-      )}
 
-      <Button
-        type="submit"
-        variant="primary"
-        size="lg"
-        loading={checking}
-        disabled={!password}
-        className="w-full mt-6 hover:-translate-y-0.5"
-      >
-        {checking ? "Signing in..." : "Sign In"}
-      </Button>
-    </form>
-  </div>
-);
+        <div className="space-y-4">
+          <Field label="Username">
+            <TextInput
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="admin"
+              autoFocus
+            />
+          </Field>
+
+          <Field label="Password">
+            <div className="relative">
+              <TextInput
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="pr-11"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 border-none bg-transparent cursor-pointer p-1"
+                style={{ color: "#aaa" }}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </Field>
+        </div>
+
+        {error && (
+          <p
+            className="text-sm mt-4 flex items-center gap-1.5"
+            style={{ color: BRAND.crimson }}
+          >
+            <AlertCircle size={14} />
+            {error}
+          </p>
+        )}
+
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          loading={checking}
+          disabled={!password}
+          className="w-full mt-6 hover:-translate-y-0.5"
+        >
+          {checking ? "Signing in..." : "Sign In"}
+        </Button>
+      </form>
+    </div>
+  );
 }
 
 /* ── Sticky top navbar ────────────────────────────────────────────── */
@@ -781,9 +776,7 @@ function Navbar({ username, onLogout, mobileNavOpen, setMobileNavOpen }) {
           </div>
           <div className="hidden sm:block">
             <div className="flex items-center gap-2">
-              <span className="font-display font-bold text-sm text-white">
-                ARZ Admin
-              </span>
+              <span className="font-bold text-sm text-white">ARZ Admin</span>
               <span
                 className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full"
                 style={{
@@ -958,7 +951,7 @@ function StatsOverview({ password }) {
 
 /* ── Database tab — same fetch logic, professional data explorer ───── */
 
-function DatabasePanel({ password }) {
+function DatabasePanel({ password, showToast }) {
   const [tab, setTab] = useState("applications");
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -969,6 +962,8 @@ function DatabasePanel({ password }) {
   const [filterColumn, setFilterColumn] = useState("all");
   const [filterValue, setFilterValue] = useState("all");
   const [viewRow, setViewRow] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -1043,6 +1038,24 @@ function DatabasePanel({ password }) {
 
   const initialLoading = loading && rows.length === 0;
   const refreshing = loading && rows.length > 0;
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await adminRequest(`/admin/${tab}/${deleteTarget._id}`, password, {
+        method: "DELETE",
+      });
+      setDeleteTarget(null);
+      setRefreshKey((k) => k + 1);
+      setCounts((c) => ({ ...c, [tab]: Math.max((c[tab] ?? 1) - 1, 0) }));
+      showToast?.("Record deleted.", "success");
+    } catch (err) {
+      showToast?.(err.message || "Couldn't delete record.", "error");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div>
@@ -1248,17 +1261,33 @@ function DatabasePanel({ password }) {
                           </td>
                         ))}
                         <td
-                          className="px-4 py-3 text-right"
+                          className="px-4 py-3 text-right whitespace-nowrap"
                           style={{ borderBottom: "1px solid #f5f6fa" }}
                         >
-                          <button
-                            onClick={() => setViewRow(row)}
-                            className="p-1.5 rounded-lg border-none cursor-pointer"
-                            style={{ background: "#f0f2ff", color: BRAND.navy }}
-                            aria-label="View record"
-                          >
-                            <Eye size={13} />
-                          </button>
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => setViewRow(row)}
+                              className="p-1.5 rounded-lg border-none cursor-pointer"
+                              style={{
+                                background: "#f0f2ff",
+                                color: BRAND.navy,
+                              }}
+                              aria-label="View record"
+                            >
+                              <Eye size={13} />
+                            </button>
+                            <button
+                              onClick={() => setDeleteTarget(row)}
+                              className="p-1.5 rounded-lg border-none cursor-pointer"
+                              style={{
+                                background: "#fdeceb",
+                                color: BRAND.crimson,
+                              }}
+                              aria-label="Delete record"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1290,13 +1319,22 @@ function DatabasePanel({ password }) {
                         </span>
                       </div>
                     ))}
-                    <button
-                      onClick={() => setViewRow(row)}
-                      className="mt-2 w-full text-xs font-bold py-1.5 rounded-lg border-none cursor-pointer"
-                      style={{ background: "#f0f2ff", color: BRAND.navy }}
-                    >
-                      View full record
-                    </button>
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() => setViewRow(row)}
+                        className="flex-1 text-xs font-bold py-1.5 rounded-lg border-none cursor-pointer"
+                        style={{ background: "#f0f2ff", color: BRAND.navy }}
+                      >
+                        View full record
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(row)}
+                        className="text-xs font-bold px-3 py-1.5 rounded-lg border-none cursor-pointer flex items-center gap-1.5"
+                        style={{ background: "#fdeceb", color: BRAND.crimson }}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1308,6 +1346,15 @@ function DatabasePanel({ password }) {
       {viewRow && (
         <RecordDetailModal row={viewRow} onClose={() => setViewRow(null)} />
       )}
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete this record?"
+        message="This will be permanently removed from the database. This can't be undone."
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+        loading={deleting}
+      />
     </div>
   );
 }
@@ -1388,10 +1435,7 @@ function UniversityFormModal({ country, editing, password, onClose, onSaved }) {
         style={{ boxShadow: "0 30px 70px -20px rgba(0,0,0,0.4)" }}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2
-            className="font-display text-lg font-bold"
-            style={{ color: BRAND.navy }}
-          >
+          <h2 className="text-lg font-bold" style={{ color: BRAND.navy }}>
             {editing ? "Edit University" : "Add University"}
           </h2>
           <button
@@ -1692,10 +1736,7 @@ function UniversitiesPanel({ password, showToast }) {
                 )}
               </div>
               <div className="p-4">
-                <h3
-                  className="font-display font-bold text-sm"
-                  style={{ color: BRAND.navy }}
-                >
+                <h3 className="font-bold text-sm" style={{ color: BRAND.navy }}>
                   {uni.name}
                 </h3>
                 {uni.location && (
@@ -1856,10 +1897,7 @@ function StoryFormModal({ editing, password, onClose, onSaved }) {
         style={{ boxShadow: "0 30px 70px -20px rgba(0,0,0,0.4)" }}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2
-            className="font-display text-lg font-bold"
-            style={{ color: BRAND.navy }}
-          >
+          <h2 className="text-lg font-bold" style={{ color: BRAND.navy }}>
             {editing ? "Edit Success Story" : "Add Success Story"}
           </h2>
           <button
@@ -1933,7 +1971,10 @@ function StoryFormModal({ editing, password, onClose, onSaved }) {
           </div>
 
           {/* Updated Field Label to YouTube Video URL */}
-          <Field label="YouTube Video URL" hint="Paste YouTube watch URL (e.g., https://www.youtube.com/watch?v=...)">
+          <Field
+            label="YouTube Video URL"
+            hint="Paste YouTube watch URL (e.g., https://www.youtube.com/watch?v=...)"
+          >
             <TextInput
               value={form.image}
               onChange={(e) => update("image", e.target.value)}
@@ -2151,7 +2192,10 @@ function StoriesPanel({ password, showToast }) {
                     {/* YouTube Play Icon Center */}
                     <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                       <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white shadow-md">
-                        <svg className="w-5 h-5 fill-current translate-x-0.5" viewBox="0 0 24 24">
+                        <svg
+                          className="w-5 h-5 fill-current translate-x-0.5"
+                          viewBox="0 0 24 24"
+                        >
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </div>
@@ -2160,7 +2204,7 @@ function StoriesPanel({ password, showToast }) {
 
                   <div className="p-4 pb-2">
                     <h3
-                      className="font-display font-bold text-sm"
+                      className="font-bold text-sm"
                       style={{ color: BRAND.navy }}
                     >
                       {story.name}
@@ -2294,7 +2338,10 @@ export default function AdminDashboard() {
   const activeItem = NAV_ITEMS.find((n) => n.value === tab);
 
   return (
-    <div className="min-h-screen" style={{ background: "#f6f7fb" }}>
+    <div
+      className="min-h-screen"
+      style={{ background: "#f6f7fb", fontFamily: "'Inter', sans-serif" }}
+    >
       <Navbar
         username={username}
         onLogout={logout}
@@ -2305,10 +2352,7 @@ export default function AdminDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1
-              className="font-display text-2xl font-bold"
-              style={{ color: BRAND.navy }}
-            >
+            <h1 className="text-2xl font-bold" style={{ color: BRAND.navy }}>
               {activeItem?.label}
             </h1>
             <p className="text-sm mt-1" style={{ color: "#999" }}>
@@ -2320,7 +2364,9 @@ export default function AdminDashboard() {
 
         <StatsOverview password={password} />
 
-        {tab === "database" && <DatabasePanel password={password} />}
+        {tab === "database" && (
+          <DatabasePanel password={password} showToast={showToast} />
+        )}
         {tab === "universities" && (
           <UniversitiesPanel password={password} showToast={showToast} />
         )}
