@@ -7,9 +7,20 @@ import { apiGet } from "../config/api";
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80";
 
-// Shown while stories are loading, and if the fetch fails — never leaves
-// the section looking broken.
 const MAX_STORIES_SHOWN = 6;
+
+// Helper: Extract YouTube video ID and generate high-quality thumbnail URL
+function getYouTubeThumbnail(url) {
+  if (!url) return FALLBACK_IMAGE;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+
+  if (match && match[2].length === 11) {
+    return `https://img.youtube.com/vi/${match[2]}/hqdefault.jpg`;
+  }
+
+  return FALLBACK_IMAGE;
+}
 
 export default function SuccessStories() {
   const navigate = useNavigate();
@@ -45,132 +56,160 @@ export default function SuccessStories() {
 
         {stories.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stories.map((story) => (
-              <div
-                key={story._id}
-                className="card bg-white rounded-2xl overflow-hidden group hover:-translate-y-2 transition-all duration-300"
-                style={{ boxShadow: "0 4px 24px rgba(26,42,108,0.10)" }}
-              >
-                <figure className="relative h-56 overflow-hidden">
-                  <img
-                    src={story.image || FALLBACK_IMAGE}
-                    alt={story.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        "linear-gradient(to top, rgba(10,20,60,0.90) 0%, rgba(10,20,60,0.25) 55%, transparent 100%)",
-                    }}
-                  />
+            {stories.map((story) => {
+              const videoThumbnail = getYouTubeThumbnail(story.image);
 
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <p className="text-white font-bold text-base leading-tight">
-                      {story.name}
-                    </p>
-                    <p
-                      className="text-xs mt-0.5 flex items-center gap-1.5"
-                      style={{ color: "#c8d0e0" }}
-                    >
-                      <img
-                        src={`https://flagcdn.com/w20/${story.flagCode}.png`}
-                        className="w-4 h-3 object-cover rounded-sm"
-                        alt=""
-                      />
-                      {story.city} — {story.country}
-                    </p>
-                  </div>
-                </figure>
-
-                <div className="card-body p-4 gap-0">
+              return (
+                <div
+                  key={story._id}
+                  className="card bg-white rounded-2xl overflow-hidden group hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between"
+                  style={{ boxShadow: "0 4px 24px rgba(26,42,108,0.10)" }}
+                >
                   <div>
-                    <div className="flex justify-between">
-                      <div>
-                        <div className="flex items-start gap-2 mb-1.5">
+                    {/* YouTube Video Thumbnail Container */}
+                    <figure className="relative h-56 overflow-hidden bg-slate-900">
+                      <img
+                        src={videoThumbnail}
+                        alt={story.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90"
+                      />
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background:
+                            "linear-gradient(to top, rgba(10,20,60,0.90) 0%, rgba(10,20,60,0.25) 55%, transparent 100%)",
+                        }}
+                      />
+
+                      {/* YouTube Play Icon Center Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="w-12 h-12 rounded-full bg-red-600/90 group-hover:bg-red-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-all duration-300">
                           <svg
-                            className="mt-0.5 shrink-0"
-                            width="13"
-                            height="13"
+                            className="w-6 h-6 fill-current translate-x-0.5"
                             viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#1a2a6c"
-                            strokeWidth="2.2"
                           >
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                            <polyline points="9 22 9 12 15 12 15 22" />
+                            <path d="M8 5v14l11-7z" />
                           </svg>
-                          <p
-                            className="text-xs font-bold leading-tight"
-                            style={{ color: "#1a2a6c" }}
-                          >
-                            {story.university}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <svg
-                            className="shrink-0"
-                            width="13"
-                            height="13"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#b01c2e"
-                            strokeWidth="2.2"
-                          >
-                            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                            <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                          </svg>
-                          <p
-                            className="text-md font-bold"
-                            style={{ color: "#4b5563" }}
-                          >
-                            {story.course}
-                          </p>
                         </div>
                       </div>
+
+                      {/* Student Info Overlay */}
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <p className="text-white font-bold text-base leading-tight">
+                          {story.name}
+                        </p>
+                        <p
+                          className="text-xs mt-0.5 flex items-center gap-1.5"
+                          style={{ color: "#c8d0e0" }}
+                        >
+                          {story.flagCode && (
+                            <img
+                              src={`https://flagcdn.com/w20/${story.flagCode}.png`}
+                              className="w-4 h-3 object-cover rounded-sm"
+                              alt=""
+                            />
+                          )}
+                          {story.city} {story.city && story.country ? "—" : ""}{" "}
+                          {story.country}
+                        </p>
+                      </div>
+                    </figure>
+
+                    <div className="card-body p-4 gap-0">
                       <div>
-                        <span className="text-white bg-blue-800 text-xs font-bold px-3 py-1 rounded-full">
-                          Visa Approved
-                        </span>
+                        <div className="flex justify-between">
+                          <div>
+                            <div className="flex items-start gap-2 mb-1.5">
+                              <svg
+                                className="mt-0.5 shrink-0"
+                                width="13"
+                                height="13"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#1a2a6c"
+                                strokeWidth="2.2"
+                              >
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                <polyline points="9 22 9 12 15 12 15 22" />
+                              </svg>
+                              <p
+                                className="text-xs font-bold leading-tight"
+                                style={{ color: "#1a2a6c" }}
+                              >
+                                {story.university}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <svg
+                                className="shrink-0"
+                                width="13"
+                                height="13"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#b01c2e"
+                                strokeWidth="2.2"
+                              >
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                              </svg>
+                              <p
+                                className="text-md font-bold"
+                                style={{ color: "#4b5563" }}
+                              >
+                                {story.course}
+                              </p>
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-white bg-blue-800 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                              Visa Approved
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        className="h-px w-full mb-3 mt-3"
+                        style={{ backgroundColor: "#e8eaf6" }}
+                      />
+
+                      <div className="grid grid-cols-2 gap-2 mb-3">
+                        <div
+                          className="rounded-xl p-2.5 text-center border"
+                          style={{ borderColor: "#e8eaf6" }}
+                        >
+                          <p className="text-xs text-red-800 font-bold">
+                            {story.tuition || "N/A"}
+                          </p>
+                          <p className="text-xs mt-0.5">💰 Tuition / yr</p>
+                        </div>
+                        <div
+                          className="rounded-xl p-2.5 text-center border"
+                          style={{ borderColor: "#e8eaf6" }}
+                        >
+                          <p className="text-xs font-bold">
+                            {story.intake || "N/A"}
+                          </p>
+                          <p className="text-xs mt-0.5">📅 Intake</p>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div
-                    className="h-px w-full mb-3 mt-3"
-                    style={{ backgroundColor: "#e8eaf6" }}
-                  />
-
-                  <div className="grid grid-cols-2 gap-2 mb-3">
-                    <div
-                      className="rounded-xl p-2.5 text-center border"
-                      style={{ borderColor: "#e8eaf6" }}
+                  {/* Replaced 'Start Your Journey' with 'View Success Story' opening YouTube URL */}
+                  <div className="p-4 pt-0">
+                    <a
+                      href={story.image || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex bg-red-600 hover:bg-red-700 items-center justify-center gap-1.5 w-full rounded-full py-2 text-sm font-bold text-white transition-all hover:opacity-95 active:scale-95 no-underline"
                     >
-                      <p className="text-xs text-red-800 font-bold">
-                        {story.tuition || "N/A"}
-                      </p>
-                      <p className="text-xs mt-0.5">💰 Tuition / yr</p>
-                    </div>
-                    <div
-                      className="rounded-xl p-2.5 text-center border"
-                      style={{ borderColor: "#e8eaf6" }}
-                    >
-                      <p className="text-xs font-bold">
-                        {story.intake || "N/A"}
-                      </p>
-                      <p className="text-xs mt-0.5">📅 Intake</p>
-                    </div>
+                      View Success Story →
+                    </a>
                   </div>
-
-                  <button
-                    onClick={handleApply}
-                    className="flex bg-gray-800 items-center justify-center gap-1.5 w-full rounded-full py-2 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 border-none cursor-pointer"
-                  >
-                    Start Your Journey →
-                  </button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

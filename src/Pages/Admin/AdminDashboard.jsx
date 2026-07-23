@@ -1781,7 +1781,18 @@ function UniversitiesPanel({ password, showToast }) {
   );
 }
 
-/* ── Success story add/edit form (modal) — same submit logic ────────── */
+/* ── Helper: Extract YouTube Video ID & Return Thumbnail ────────── */
+function getYouTubeThumbnail(url) {
+  if (!url) return "https://via.placeholder.com/480x360?text=No+Video+URL";
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://img.youtube.com/vi/${match[2]}/hqdefault.jpg`;
+  }
+  return "https://via.placeholder.com/480x360?text=Invalid+YouTube+URL";
+}
+
+/* ── Success story add/edit form (modal) — YouTube URL updated ────────── */
 
 function StoryFormModal({ editing, password, onClose, onSaved }) {
   const [form, setForm] = useState(editing || emptyStoryForm);
@@ -1812,7 +1823,7 @@ function StoryFormModal({ editing, password, onClose, onSaved }) {
       course: form.course,
       tuition: form.tuition,
       intake: form.intake,
-      image: form.image,
+      image: form.image, // Holds the YouTube Video URL
     };
     try {
       if (editing) {
@@ -1920,12 +1931,29 @@ function StoryFormModal({ editing, password, onClose, onSaved }) {
               />
             </Field>
           </div>
-          <Field label="Photo URL">
+
+          {/* Updated Field Label to YouTube Video URL */}
+          <Field label="YouTube Video URL" hint="Paste YouTube watch URL (e.g., https://www.youtube.com/watch?v=...)">
             <TextInput
               value={form.image}
               onChange={(e) => update("image", e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=..."
             />
           </Field>
+
+          {/* Real-time YouTube Thumbnail Preview */}
+          {form.image && (
+            <div className="rounded-xl overflow-hidden border border-slate-200 mt-2">
+              <p className="text-[10px] font-bold text-slate-400 p-1.5 bg-slate-50 border-b uppercase">
+                Thumbnail Preview
+              </p>
+              <img
+                src={getYouTubeThumbnail(form.image)}
+                alt="Thumbnail preview"
+                className="w-full h-36 object-cover"
+              />
+            </div>
+          )}
         </div>
 
         {error && (
@@ -1961,7 +1989,7 @@ function StoryFormModal({ editing, password, onClose, onSaved }) {
   );
 }
 
-/* ── Success Stories tab — same fetch/delete logic, new look ───────── */
+/* ── Success Stories tab — updated card design with View Success Story button ── */
 
 function StoriesPanel({ password, showToast }) {
   const [list, setList] = useState([]);
@@ -2084,115 +2112,122 @@ function StoriesPanel({ password, showToast }) {
 
       {!loading && !error && filteredList.length > 0 && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredList.map((story) => (
-            <div
-              key={story._id}
-              className="group rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-              style={{ background: "#fff", border: "1px solid #eef0f8" }}
-            >
+          {filteredList.map((story) => {
+            const videoThumbnail = getYouTubeThumbnail(story.image);
+
+            return (
               <div
-                className="h-20 relative"
-                style={{
-                  background: `linear-gradient(135deg, ${BRAND.crimson}, #8e1422)`,
-                }}
+                key={story._id}
+                className="group rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg flex flex-col justify-between"
+                style={{ background: "#fff", border: "1px solid #eef0f8" }}
               >
-                {story.flagCode && (
-                  <img
-                    src={`https://flagcdn.com/w40/${story.flagCode}.png`}
-                    alt=""
-                    className="absolute top-2.5 right-2.5 w-6 h-4 rounded-sm object-cover border border-white/40"
-                  />
-                )}
-                <Badge
-                  variant="success"
-                  icon={CheckCircle2}
-                  className="absolute top-2.5 left-2.5"
-                >
-                  Visa Approved
-                </Badge>
-              </div>
-              <div className="px-4 pb-4">
-                <div className="flex items-end gap-3 -mt-6 mb-2">
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-display font-bold text-sm text-white overflow-hidden"
-                    style={{ background: BRAND.navy, border: "3px solid #fff" }}
-                  >
-                    {story.image ? (
+                <div>
+                  {/* Banner with YouTube Thumbnail & Play Overlay */}
+                  <div className="h-36 relative bg-slate-900 overflow-hidden">
+                    <img
+                      src={videoThumbnail}
+                      alt={story.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+
+                    {/* Flag badge */}
+                    {story.flagCode && (
                       <img
-                        src={story.image}
-                        alt={story.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
+                        src={`https://flagcdn.com/w40/${story.flagCode}.png`}
+                        alt=""
+                        className="absolute top-2.5 right-2.5 w-6 h-4 rounded-sm object-cover border border-white/40 z-10"
                       />
-                    ) : (
-                      story.name?.slice(0, 1)?.toUpperCase() || (
-                        <User size={16} />
-                      )
                     )}
+
+                    {/* Visa badge */}
+                    <Badge
+                      variant="success"
+                      icon={CheckCircle2}
+                      className="absolute top-2.5 left-2.5 z-10"
+                    >
+                      Visa Approved
+                    </Badge>
+
+                    {/* YouTube Play Icon Center */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white shadow-md">
+                        <svg className="w-5 h-5 fill-current translate-x-0.5" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 pb-2">
+                    <h3
+                      className="font-display font-bold text-sm"
+                      style={{ color: BRAND.navy }}
+                    >
+                      {story.name}
+                    </h3>
+                    <p
+                      className="text-xs mt-0.5 flex items-center gap-1"
+                      style={{ color: "#999" }}
+                    >
+                      <Building2 size={11} /> {story.university}
+                      {story.country ? ` — ${story.country}` : ""}
+                    </p>
+                    {story.course && (
+                      <p className="text-xs mt-1" style={{ color: "#666" }}>
+                        {story.course}
+                      </p>
+                    )}
+                    <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
+                      {story.intake && (
+                        <Badge variant="info" icon={Calendar}>
+                          {story.intake}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <h3
-                  className="font-display font-bold text-sm"
-                  style={{ color: BRAND.navy }}
-                >
-                  {story.name}
-                </h3>
-                <p
-                  className="text-xs mt-0.5 flex items-center gap-1"
-                  style={{ color: "#999" }}
-                >
-                  <Building2 size={11} /> {story.university}
-                  {story.country ? ` — ${story.country}` : ""}
-                </p>
-                {story.course && (
-                  <p className="text-xs mt-1" style={{ color: "#666" }}>
-                    {story.course}
-                  </p>
-                )}
-                <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
-                  {story.intake && (
-                    <Badge variant="info" icon={Calendar}>
-                      {story.intake}
-                    </Badge>
+
+                {/* Card Footer Actions */}
+                <div className="p-4 pt-2">
+                  {/* View Success Story Button replacing Start Your Journey */}
+                  {story.image && (
+                    <a
+                      href={story.image}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full flex items-center justify-center gap-1.5 text-xs font-bold text-white py-2 px-3 rounded-xl mb-2 transition-all hover:brightness-110 no-underline"
+                      style={{ background: BRAND.crimson }}
+                    >
+                      View Success Story
+                    </a>
                   )}
-                  {story.createdAt && !isNaN(Date.parse(story.createdAt)) && (
-                    <span className="text-[10px]" style={{ color: "#bbb" }}>
-                      Added{" "}
-                      {new Date(story.createdAt).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  )}
-                </div>
-                <div className="flex gap-2 mt-3">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    icon={Pencil}
-                    className="flex-1"
-                    onClick={() => {
-                      setEditing(story);
-                      setFormOpen(true);
-                    }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    icon={Trash2}
-                    onClick={() => setDeleteTarget(story)}
-                  >
-                    Delete
-                  </Button>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      icon={Pencil}
+                      className="flex-1"
+                      onClick={() => {
+                        setEditing(story);
+                        setFormOpen(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      icon={Trash2}
+                      onClick={() => setDeleteTarget(story)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -2227,7 +2262,6 @@ function StoriesPanel({ password, showToast }) {
     </div>
   );
 }
-
 /* ── Page shell — sticky navbar layout ───────────────────────────── */
 
 export default function AdminDashboard() {
