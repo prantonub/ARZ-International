@@ -170,7 +170,7 @@ const subscribe = async () => {
             <div className="flex gap-3">
               <SocialIcon
                 title="Facebook"
-                href="https://facebook.com"
+                href="https://www.facebook.com/arzinternational.net"
                 icon={
                   <svg
                     className="w-5 h-5"
@@ -183,7 +183,7 @@ const subscribe = async () => {
               />
               <SocialIcon
                 title="Instagram"
-                href="https://instagram.com"
+                href="https://www.instagram.com/arz_international_/?hl=en"
                 icon={
                   <svg
                     className="w-5 h-5"
@@ -214,7 +214,7 @@ const subscribe = async () => {
               />
               <SocialIcon
                 title="LinkedIn"
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/arzinternational/"
                 icon={
                   <svg
                     className="w-5 h-5"
