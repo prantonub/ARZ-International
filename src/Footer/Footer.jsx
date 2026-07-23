@@ -311,7 +311,7 @@ const subscribe = async () => {
                   href="tel:+8801308821404"
                   className="text-gray-300 hover:text-[#c9a84c] text-sm transition-colors duration-300 block"
                 >
-                  +880 1308 821404
+                  +8801334927272
                 </a>
               </li>
               <li>
@@ -320,7 +320,7 @@ const subscribe = async () => {
                   href="mailto:info@arzinternational.com"
                   className="text-gray-300 hover:text-[#c9a84c] text-sm transition-colors duration-300 block"
                 >
-                  info@arzinternational.com
+                  info@arzinternational.net
                 </a>
               </li>
               <li>
