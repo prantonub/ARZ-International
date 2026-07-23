@@ -99,7 +99,7 @@ export default function Navbar() {
   const goToContact = () => navigate("/contact");
 
   return (
-    <div className="h-[76px] w-full relative z-50">
+    <div className="w-full relative z-50">
       <nav
         className="fixed top-0 left-0 right-0 z-50 h-[76px] px-4 md:px-6 lg:px-8 flex items-center justify-between font-sans transition-all duration-200 max-w-full box-border"
         style={{
