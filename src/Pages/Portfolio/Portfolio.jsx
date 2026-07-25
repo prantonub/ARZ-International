@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { goToApplicationForm } from "../../utils/scrollToForm";
+import { apiGet } from "../../config/api";
 import officePhoto from "../../assets/ARZ office pic.png";
 import koreaBdImage from "../../assets/koreaxBD.png";
 
@@ -86,75 +88,6 @@ const PILLARS = [
   },
 ];
 
-// Reconciled from the site's two previous (conflicting) team lists —
-// one canonical role per person.
-const TEAM = [
-  {
-    name: "Sadik Arzumand Ahmad",
-    role: "Head of Language Center",
-    desk: "South Korea Desk",
-    initials: "SA",
-    whatsapp: "8801700000001",
-    email: "sadik@arzinternational.com",
-  },
-  {
-    name: "Wasif Ahmed Jisan",
-    role: "Business Development Manager",
-    desk: "Dhaka HQ",
-    initials: "WJ",
-    whatsapp: "8801700000002",
-    email: "wasif@arzinternational.com",
-  },
-  {
-    name: "Ashraful Haque Antor",
-    role: "Country Manager, UK",
-    desk: "Dhaka HQ",
-    initials: "AA",
-    whatsapp: "8801700000003",
-    email: "ashraful@arzinternational.com",
-  },
-  {
-    name: "Rakib Hossain",
-    role: "Language Instructor",
-    desk: "South Korea Desk",
-    initials: "RH",
-    whatsapp: "8801700000004",
-    email: "rakib@arzinternational.com",
-  },
-  {
-    name: "Rahat Farhan",
-    role: "Operations Manager",
-    desk: "Dhaka HQ",
-    initials: "RF",
-    whatsapp: "8801700000005",
-    email: "rahat@arzinternational.com",
-  },
-  {
-    name: "Nusrat Alam Nadia",
-    role: "General Manager",
-    desk: "Dhaka HQ",
-    initials: "NN",
-    whatsapp: "8801700000006",
-    email: "nusrat@arzinternational.com",
-  },
-  {
-    name: "Nazat Rahman",
-    role: "Business Development Manager, Korea",
-    desk: "South Korea Desk",
-    initials: "NR",
-    whatsapp: "8801700000007",
-    email: "nazat@arzinternational.com",
-  },
-  {
-    name: "Sumaiya Islam",
-    role: "Marketing Manager",
-    desk: "Dhaka HQ",
-    initials: "SI",
-    whatsapp: "8801700000008",
-    email: "sumaiya@arzinternational.com",
-  },
-];
-
 const DESTINATIONS = [
   {
     name: "South Korea",
@@ -224,6 +157,109 @@ function CTAButtons({ onApply, onContact, variant = "light" }) {
         Free Counseling
       </button>
     </div>
+  );
+}
+
+/* ── Success Stories — blog-style, admin-managed ─────────────────────
+   Reuses the same /success-stories data that powers the homepage
+   section (same admin dashboard tab manages both), just presented as
+   a fuller, blog-like list here instead of a compact card grid.     */
+
+function StoryPost({ story, onApply }) {
+  return (
+    <div
+      className="grid sm:grid-cols-[220px_1fr] gap-6 rounded-2xl overflow-hidden bg-white transition-all duration-200 hover:shadow-lg"
+      style={{ border: "1px solid #eef0f8" }}
+    >
+      <div className="relative h-48 sm:h-full">
+        <img
+          src={
+            story.image ||
+            "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&q=80"
+          }
+          alt={story.name}
+          className="w-full h-full object-cover"
+        />
+        {story.flagCode && (
+          <img
+            src={`https://flagcdn.com/w40/${story.flagCode}.png`}
+            alt=""
+            className="absolute top-3 right-3 w-7 h-5 rounded-sm object-cover border border-white/60"
+          />
+        )}
+      </div>
+      <div className="p-5 sm:pl-0 sm:py-5 flex flex-col justify-center">
+        <span
+          className="inline-block w-fit text-[10px] font-bold uppercase px-2.5 py-1 rounded-full mb-2"
+          style={{ background: "#eafaf0", color: "#1a8a4c" }}
+        >
+          Visa Approved
+        </span>
+        <h3 className="font-display font-bold text-lg text-navy">
+          {story.name}
+        </h3>
+        <p className="text-sm mt-1" style={{ color: "#888" }}>
+          {story.university}
+          {story.country ? ` — ${story.country}` : ""}
+        </p>
+        {story.course && (
+          <p className="text-sm mt-2 leading-relaxed" style={{ color: "#555" }}>
+            {story.course}
+            {story.intake ? ` · Intake: ${story.intake}` : ""}
+            {story.tuition ? ` · ${story.tuition}` : ""}
+          </p>
+        )}
+        <button
+          onClick={onApply}
+          className="mt-4 text-sm font-bold text-brand w-fit border-none bg-transparent cursor-pointer p-0"
+        >
+          Start your own journey →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SuccessStoriesSection({ onApply }) {
+  const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    apiGet("/success-stories")
+      .then(setStories)
+      .catch(() => setStories([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (!loading && stories.length === 0) return null;
+
+  return (
+    <section className="px-6 py-16 md:py-20 max-w-4xl mx-auto">
+      <div className="text-center max-w-xl mx-auto mb-12">
+        <div className="flex justify-center mb-4">
+          <Eyebrow>From Our Students</Eyebrow>
+        </div>
+        <h2 className="font-display font-bold text-2xl md:text-4xl text-navy mb-4">
+          Success Stories
+        </h2>
+        <p className="text-slate-500">
+          Real students, real placements — updated as new students land their
+          offers.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-10 text-sm" style={{ color: "#999" }}>
+          Loading...
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {stories.map((story) => (
+            <StoryPost key={story._id} story={story} onApply={onApply} />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -388,103 +424,8 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* ── TEAM ─────────────────────────────────────────────── */}
-      <section className="px-6 py-16 md:py-20 max-w-6xl mx-auto">
-        <div className="text-center max-w-xl mx-auto mb-12">
-          <div className="flex justify-center mb-4">
-            <Eyebrow>The People Behind ARZ</Eyebrow>
-          </div>
-          <h2 className="font-display font-bold text-2xl md:text-4xl text-navy mb-4">
-            Meet the Team
-          </h2>
-          <p className="text-slate-500">
-            Reach out directly — every counselor below is a real point of
-            contact, not a call center.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-          {TEAM.map((m) => (
-            <div
-              key={m.email}
-              className="rounded-2xl p-5 border border-navy/10 text-center hover:shadow-lg transition-shadow duration-200"
-            >
-              <div className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center font-display font-bold text-lg text-white bg-gradient-to-br from-navy to-navy-light">
-                {m.initials}
-              </div>
-              <h3 className="font-display font-bold text-sm text-navy leading-tight">
-                {m.name}
-              </h3>
-              <p className="text-xs text-slate-500 mt-1 mb-1 leading-tight">
-                {m.role}
-              </p>
-              <span className="inline-block text-[10px] font-bold uppercase tracking-wide text-gold-dark">
-                {m.desk}
-              </span>
-
-              <div className="flex justify-center gap-2 mt-4">
-                <a
-                  href={`https://wa.me/${m.whatsapp}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={`WhatsApp ${m.name}`}
-                  className="w-8 h-8 rounded-full flex items-center justify-center bg-navy/5 text-navy hover:bg-navy hover:text-white transition-colors no-underline"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 22h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374A9.86 9.86 0 012.166 12c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898A9.825 9.825 0 0121.935 12c-.003 5.45-4.437 9.884-9.885 9.884" />
-                  </svg>
-                </a>
-                <a
-                  href={`mailto:${m.email}`}
-                  title={`Email ${m.name}`}
-                  className="w-8 h-8 rounded-full flex items-center justify-center bg-navy/5 text-navy hover:bg-navy hover:text-white transition-colors no-underline"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  >
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                    <polyline points="22,6 12,13 2,6" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── FINAL CTA ────────────────────────────────────────── */}
-      <section
-        className="px-6 py-16 md:py-20 text-center"
-        style={{
-          background: "linear-gradient(135deg, #1a2a6c 0%, #b01c2e 100%)",
-        }}
-      >
-        <h2 className="font-display font-bold text-2xl md:text-4xl text-white mb-4">
-          Ready to Be Our Next Success Story?
-        </h2>
-        <p className="text-white/80 max-w-xl mx-auto mb-8">
-          Talk to a real counselor, get a honest assessment of your options, and
-          start your application with a team that's done this hundreds of times.
-        </p>
-        <div className="flex justify-center">
-          <CTAButtons
-            onApply={handleApply}
-            onContact={handleContact}
-            variant="dark"
-          />
-        </div>
-      </section>
+      {/* ── SUCCESS STORIES (blog-style, admin-managed) ─────── */}
+      <SuccessStoriesSection onApply={handleApply} />
     </div>
   );
 }

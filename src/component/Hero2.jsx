@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { goToApplicationForm } from "../utils/scrollToForm";
+import { apiGet } from "../config/api";
 
 const KEYFRAMES = `
   @keyframes fadeUp    { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
@@ -25,15 +26,33 @@ const KEYFRAMES = `
   .font-condensed { font-family: 'Fraunces', serif; font-style: normal; }
 `;
 
-const heroImages = [
+// Used only if the admin hasn't added any homepage images yet, or the
+// fetch fails — the slideshow should never end up empty/broken.
+const FALLBACK_IMAGES = [
   "https://plus.unsplash.com/premium_photo-1683887034552-4635692bb57c?q=80&w=1169&auto=format&fit=crop",
   "https://images.unsplash.com/flagged/photo-1554473675-d0904f3cbf38?q=80&w=1170&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1569447891824-7a1758aa73a2?q=80&w=1172&auto=format&fit=crop",
 ];
 
 function ImageSlideshow() {
+  const [heroImages, setHeroImages] = useState(FALLBACK_IMAGES);
   const [current, setCurrent] = useState(0);
   const [prev, setPrev] = useState(null);
+
+  useEffect(() => {
+    apiGet("/homepage-images")
+      .then((data) => {
+        const urls = data.map((d) => d.image).filter(Boolean);
+        if (urls.length > 0) {
+          setHeroImages(urls);
+          setCurrent(0);
+          setPrev(null);
+        }
+      })
+      .catch(() => {
+        // keep FALLBACK_IMAGES on failure
+      });
+  }, []);
 
   useEffect(() => {
     const id = setInterval(() => {

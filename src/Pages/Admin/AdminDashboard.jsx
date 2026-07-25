@@ -32,6 +32,7 @@ import {
   Mail,
   Users,
   FileText,
+  Image,
 } from "lucide-react";
 
 /* ── Brand tokens (kept from the original ARZ palette) ──────────────
@@ -63,6 +64,8 @@ const NAV_ITEMS = [
   { value: "database", label: "Database", icon: Database },
   { value: "universities", label: "Universities", icon: GraduationCap },
   { value: "stories", label: "Success Stories", icon: Trophy },
+  { value: "team", label: "Team", icon: Users },
+  { value: "homepage", label: "Homepage Images", icon: Image },
 ];
 
 const emptyUniForm = {
@@ -86,6 +89,20 @@ const emptyStoryForm = {
   tuition: "",
   intake: "",
   image: "",
+};
+
+const emptyTeamForm = {
+  name: "",
+  role: "",
+  desk: "",
+  image: "",
+  whatsapp: "",
+  email: "",
+};
+
+const emptyImageForm = {
+  image: "",
+  caption: "",
 };
 
 const STATUS_VARIANT = {
@@ -2306,6 +2323,680 @@ function StoriesPanel({ password, showToast }) {
     </div>
   );
 }
+
+/* ── Team member add/edit form (modal) — plain JSON, no file upload ── */
+
+function TeamFormModal({ editing, password, onClose, onSaved }) {
+  const [form, setForm] = useState(editing || emptyTeamForm);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const update = (key, value) => setForm((f) => ({ ...f, [key]: value }));
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.role.trim()) {
+      setError("Name and role are required.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    const payload = {
+      name: form.name,
+      role: form.role,
+      desk: form.desk,
+      image: form.image,
+      whatsapp: form.whatsapp,
+      email: form.email,
+    };
+    try {
+      if (editing) {
+        await adminRequest(`/team/${editing._id}`, password, {
+          method: "PUT",
+          body: payload,
+        });
+      } else {
+        await adminRequest("/team", password, {
+          method: "POST",
+          body: payload,
+        });
+      }
+      onSaved();
+    } catch (err) {
+      setError(err.message || "Couldn't save team member.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto py-8 px-4"
+      style={{ background: "rgba(15,23,42,0.6)", backdropFilter: "blur(4px)" }}
+    >
+      <form
+        onSubmit={submit}
+        className="bg-white rounded-2xl w-full max-w-lg p-7"
+        style={{ boxShadow: "0 30px 70px -20px rgba(0,0,0,0.4)" }}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold" style={{ color: BRAND.navy }}>
+            {editing ? "Edit Team Member" : "Add Team Member"}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="w-8 h-8 rounded-full flex items-center justify-center border-none cursor-pointer"
+            style={{ background: "#f0f2f8", color: "#888" }}
+          >
+            <X size={14} />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Name" required>
+              <TextInput
+                value={form.name}
+                onChange={(e) => update("name", e.target.value)}
+              />
+            </Field>
+            <Field label="Role" required>
+              <TextInput
+                value={form.role}
+                onChange={(e) => update("role", e.target.value)}
+                placeholder="Country Manager, UK"
+              />
+            </Field>
+          </div>
+          <Field label="Desk / Location" hint="e.g. Dhaka HQ, South Korea Desk">
+            <TextInput
+              value={form.desk}
+              onChange={(e) => update("desk", e.target.value)}
+            />
+          </Field>
+          <Field label="Photo URL" hint="Leave blank to show initials instead">
+            <TextInput
+              value={form.image}
+              onChange={(e) => update("image", e.target.value)}
+              placeholder="https://..."
+            />
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="WhatsApp" hint="Digits only, e.g. 8801XXXXXXXXX">
+              <TextInput
+                value={form.whatsapp}
+                onChange={(e) => update("whatsapp", e.target.value)}
+              />
+            </Field>
+            <Field label="Email">
+              <TextInput
+                type="email"
+                value={form.email}
+                onChange={(e) => update("email", e.target.value)}
+              />
+            </Field>
+          </div>
+        </div>
+
+        {error && (
+          <p
+            className="text-sm mt-4 flex items-center gap-1.5"
+            style={{ color: BRAND.crimson }}
+          >
+            <AlertCircle size={13} />
+            {error}
+          </p>
+        )}
+
+        <div className="flex gap-3 mt-6">
+          <Button
+            type="button"
+            variant="secondary"
+            className="flex-1"
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            className="flex-1"
+            loading={saving}
+          >
+            {saving ? "Saving..." : "Save"}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* ── Team tab — shows on the About page ─────────────────────────── */
+
+function TeamPanel({ password, showToast }) {
+  const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const load = () => {
+    setLoading(true);
+    setError("");
+    apiGet("/team")
+      .then(setList)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(load, []);
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await adminRequest(`/team/${deleteTarget._id}`, password, {
+        method: "DELETE",
+      });
+      setDeleteTarget(null);
+      load();
+      showToast?.("Team member deleted.", "success");
+    } catch (err) {
+      showToast?.(err.message || "Couldn't delete team member.", "error");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const filteredList = useMemo(() => {
+    if (!search.trim()) return list;
+    const term = search.trim().toLowerCase();
+    return list.filter(
+      (m) =>
+        m.name?.toLowerCase().includes(term) ||
+        m.role?.toLowerCase().includes(term),
+    );
+  }, [list, search]);
+
+  return (
+    <div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <p className="text-sm" style={{ color: "#888" }}>
+          Shows on the About page's "Meet the Team" section.
+        </p>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+              style={{ color: "#aaa" }}
+            />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search team..."
+              className="pl-9 pr-3 py-2.5 rounded-xl text-xs outline-none w-44"
+              style={{ border: "1.5px solid #e5e7f0" }}
+            />
+          </div>
+          <Button
+            variant="accent"
+            icon={Plus}
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+          >
+            Add Member
+          </Button>
+        </div>
+      </div>
+
+      {loading && <SkeletonCardGrid count={4} />}
+      {!loading && error && (
+        <EmptyState
+          icon={AlertCircle}
+          title="Couldn't load data"
+          description={error}
+        />
+      )}
+      {!loading && !error && list.length === 0 && (
+        <EmptyState
+          icon={Users}
+          title="No team members yet"
+          description="Add your first team member."
+          action={
+            <Button
+              variant="accent"
+              size="sm"
+              icon={Plus}
+              onClick={() => {
+                setEditing(null);
+                setFormOpen(true);
+              }}
+            >
+              Add Member
+            </Button>
+          }
+        />
+      )}
+      {!loading && !error && list.length > 0 && filteredList.length === 0 && (
+        <EmptyState
+          icon={SearchX}
+          title="No matches"
+          description="Try a different search term."
+        />
+      )}
+
+      {!loading && !error && filteredList.length > 0 && (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {filteredList.map((m) => (
+            <div
+              key={m._id}
+              className="rounded-2xl p-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+              style={{ background: "#fff", border: "1px solid #eef0f8" }}
+            >
+              {m.image ? (
+                <img
+                  src={m.image}
+                  alt={m.name}
+                  className="w-14 h-14 rounded-full mx-auto mb-3 object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              ) : (
+                <div
+                  className="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center font-bold text-sm text-white"
+                  style={{
+                    background: `linear-gradient(135deg, ${BRAND.navy}, ${BRAND.navySoft})`,
+                  }}
+                >
+                  {(m.name || "")
+                    .split(" ")
+                    .slice(0, 2)
+                    .map((w) => w[0])
+                    .join("")
+                    .toUpperCase()}
+                </div>
+              )}
+              <h3 className="font-bold text-sm" style={{ color: BRAND.navy }}>
+                {m.name}
+              </h3>
+              <p className="text-xs mt-0.5" style={{ color: "#999" }}>
+                {m.role}
+              </p>
+              {m.desk && (
+                <span
+                  className="inline-block text-[10px] font-bold uppercase mt-1"
+                  style={{ color: "#a4863a" }}
+                >
+                  {m.desk}
+                </span>
+              )}
+              <div className="flex gap-2 mt-4">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={Pencil}
+                  className="flex-1"
+                  onClick={() => {
+                    setEditing(m);
+                    setFormOpen(true);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  icon={Trash2}
+                  onClick={() => setDeleteTarget(m)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {formOpen && (
+        <TeamFormModal
+          editing={editing}
+          password={password}
+          onClose={() => setFormOpen(false)}
+          onSaved={() => {
+            setFormOpen(false);
+            load();
+            showToast?.(
+              editing ? "Team member updated." : "Team member added.",
+              "success",
+            );
+          }}
+        />
+      )}
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Remove team member?"
+        message={
+          deleteTarget
+            ? `"${deleteTarget.name}" will be removed from the About page.`
+            : ""
+        }
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+        loading={deleting}
+      />
+    </div>
+  );
+}
+
+/* ── Homepage image add/edit form (modal) ────────────────────────── */
+
+function ImageFormModal({ editing, password, onClose, onSaved }) {
+  const [form, setForm] = useState(editing || emptyImageForm);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const update = (key, value) => setForm((f) => ({ ...f, [key]: value }));
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!form.image.trim()) {
+      setError("Image URL is required.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    const payload = { image: form.image, caption: form.caption };
+    try {
+      if (editing) {
+        await adminRequest(`/homepage-images/${editing._id}`, password, {
+          method: "PUT",
+          body: payload,
+        });
+      } else {
+        await adminRequest("/homepage-images", password, {
+          method: "POST",
+          body: payload,
+        });
+      }
+      onSaved();
+    } catch (err) {
+      setError(err.message || "Couldn't save image.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto py-8 px-4"
+      style={{ background: "rgba(15,23,42,0.6)", backdropFilter: "blur(4px)" }}
+    >
+      <form
+        onSubmit={submit}
+        className="bg-white rounded-2xl w-full max-w-lg p-7"
+        style={{ boxShadow: "0 30px 70px -20px rgba(0,0,0,0.4)" }}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold" style={{ color: BRAND.navy }}>
+            {editing ? "Edit Homepage Image" : "Add Homepage Image"}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="w-8 h-8 rounded-full flex items-center justify-center border-none cursor-pointer"
+            style={{ background: "#f0f2f8", color: "#888" }}
+          >
+            <X size={14} />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <Field
+            label="Image URL"
+            required
+            hint="Shows in the rotating homepage hero"
+          >
+            <TextInput
+              value={form.image}
+              onChange={(e) => update("image", e.target.value)}
+              placeholder="https://..."
+            />
+          </Field>
+          {form.image && (
+            <div
+              className="rounded-xl overflow-hidden"
+              style={{ border: "1px solid #eef0f8" }}
+            >
+              <img
+                src={form.image}
+                alt="Preview"
+                className="w-full h-40 object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            </div>
+          )}
+          <Field
+            label="Caption"
+            hint="For your own reference only — not shown on the site"
+          >
+            <TextInput
+              value={form.caption}
+              onChange={(e) => update("caption", e.target.value)}
+            />
+          </Field>
+        </div>
+
+        {error && (
+          <p
+            className="text-sm mt-4 flex items-center gap-1.5"
+            style={{ color: BRAND.crimson }}
+          >
+            <AlertCircle size={13} />
+            {error}
+          </p>
+        )}
+
+        <div className="flex gap-3 mt-6">
+          <Button
+            type="button"
+            variant="secondary"
+            className="flex-1"
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            className="flex-1"
+            loading={saving}
+          >
+            {saving ? "Saving..." : "Save"}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* ── Homepage Images tab — the 3 rotating hero images ───────────── */
+
+function HomepageImagesPanel({ password, showToast }) {
+  const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const load = () => {
+    setLoading(true);
+    setError("");
+    apiGet("/homepage-images")
+      .then(setList)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(load, []);
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await adminRequest(`/homepage-images/${deleteTarget._id}`, password, {
+        method: "DELETE",
+      });
+      setDeleteTarget(null);
+      load();
+      showToast?.("Image deleted.", "success");
+    } catch (err) {
+      showToast?.(err.message || "Couldn't delete image.", "error");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <p className="text-sm" style={{ color: "#888" }}>
+          Rotates in the "From Application To Visa" homepage hero. Falls back to
+          default photos if empty.
+        </p>
+        <Button
+          variant="accent"
+          icon={Plus}
+          onClick={() => {
+            setEditing(null);
+            setFormOpen(true);
+          }}
+        >
+          Add Image
+        </Button>
+      </div>
+
+      {loading && <SkeletonCardGrid count={3} />}
+      {!loading && error && (
+        <EmptyState
+          icon={AlertCircle}
+          title="Couldn't load data"
+          description={error}
+        />
+      )}
+      {!loading && !error && list.length === 0 && (
+        <EmptyState
+          icon={Image}
+          title="No images added yet"
+          description="The homepage is currently showing its default fallback photos."
+          action={
+            <Button
+              variant="accent"
+              size="sm"
+              icon={Plus}
+              onClick={() => {
+                setEditing(null);
+                setFormOpen(true);
+              }}
+            >
+              Add Image
+            </Button>
+          }
+        />
+      )}
+
+      {!loading && !error && list.length > 0 && (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {list.map((img) => (
+            <div
+              key={img._id}
+              className="rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+              style={{ background: "#fff", border: "1px solid #eef0f8" }}
+            >
+              <img
+                src={img.image}
+                alt={img.caption || "Homepage slideshow image"}
+                className="w-full h-40 object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+              <div className="p-4">
+                {img.caption && (
+                  <p
+                    className="text-xs mb-3 truncate"
+                    style={{ color: "#999" }}
+                  >
+                    {img.caption}
+                  </p>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={Pencil}
+                    className="flex-1"
+                    onClick={() => {
+                      setEditing(img);
+                      setFormOpen(true);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    icon={Trash2}
+                    onClick={() => setDeleteTarget(img)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {formOpen && (
+        <ImageFormModal
+          editing={editing}
+          password={password}
+          onClose={() => setFormOpen(false)}
+          onSaved={() => {
+            setFormOpen(false);
+            load();
+            showToast?.(editing ? "Image updated." : "Image added.", "success");
+          }}
+        />
+      )}
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete this image?"
+        message="It will be removed from the homepage rotation immediately."
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+        loading={deleting}
+      />
+    </div>
+  );
+}
+
 /* ── Page shell — sticky navbar layout ───────────────────────────── */
 
 export default function AdminDashboard() {
@@ -2372,6 +3063,12 @@ export default function AdminDashboard() {
         )}
         {tab === "stories" && (
           <StoriesPanel password={password} showToast={showToast} />
+        )}
+        {tab === "team" && (
+          <TeamPanel password={password} showToast={showToast} />
+        )}
+        {tab === "homepage" && (
+          <HomepageImagesPanel password={password} showToast={showToast} />
         )}
       </main>
 

@@ -9,6 +9,8 @@ import newsletterRoutes from "./routes/newsletter.js";
 import universityRoutes from "./routes/universities.js";
 import successStoryRoutes from "./routes/successStories.js";
 import adminRoutes from "./routes/admin.js";
+import teamRoutes from "./routes/team.js";
+import homepageImageRoutes from "./routes/homepageImages.js";
 
 import dns from "dns";
 // Change DNS
@@ -39,6 +41,8 @@ app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/universities", universityRoutes);
 app.use("/api/success-stories", successStoryRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/team", teamRoutes);
+app.use("/api/homepage-images", homepageImageRoutes);
 
 // 404 fallback for unknown API routes
 app.use("/api", (req, res) => res.status(404).json({ message: "Not found" }));
