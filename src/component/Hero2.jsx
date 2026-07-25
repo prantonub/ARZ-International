@@ -28,11 +28,11 @@ const KEYFRAMES = `
 
 // Used only if the admin hasn't added any homepage images yet, or the
 // fetch fails — the slideshow should never end up empty/broken.
-const FALLBACK_IMAGES = [
-  "https://plus.unsplash.com/premium_photo-1683887034552-4635692bb57c?q=80&w=1169&auto=format&fit=crop",
-  "https://images.unsplash.com/flagged/photo-1554473675-d0904f3cbf38?q=80&w=1170&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1569447891824-7a1758aa73a2?q=80&w=1172&auto=format&fit=crop",
-];
+// const FALLBACK_IMAGES = [
+//   "https://plus.unsplash.com/premium_photo-1683887034552-4635692bb57c?q=80&w=1169&auto=format&fit=crop",
+//   "https://images.unsplash.com/flagged/photo-1554473675-d0904f3cbf38?q=80&w=1170&auto=format&fit=crop",
+//   "https://images.unsplash.com/photo-1569447891824-7a1758aa73a2?q=80&w=1172&auto=format&fit=crop",
+// ];
 
 function ImageSlideshow() {
   const [heroImages, setHeroImages] = useState(FALLBACK_IMAGES);
