@@ -26,16 +26,8 @@ const KEYFRAMES = `
   .font-condensed { font-family: 'Fraunces', serif; font-style: normal; }
 `;
 
-// Used only if the admin hasn't added any homepage images yet, or the
-// fetch fails — the slideshow should never end up empty/broken.
-// const FALLBACK_IMAGES = [
-//   "https://plus.unsplash.com/premium_photo-1683887034552-4635692bb57c?q=80&w=1169&auto=format&fit=crop",
-//   "https://images.unsplash.com/flagged/photo-1554473675-d0904f3cbf38?q=80&w=1170&auto=format&fit=crop",
-//   "https://images.unsplash.com/photo-1569447891824-7a1758aa73a2?q=80&w=1172&auto=format&fit=crop",
-// ];
-
 function ImageSlideshow() {
-  const [heroImages, setHeroImages] = useState(FALLBACK_IMAGES);
+  const [heroImages, setHeroImages] = useState([]);
   const [current, setCurrent] = useState(0);
   const [prev, setPrev] = useState(null);
 
@@ -49,18 +41,20 @@ function ImageSlideshow() {
           setPrev(null);
         }
       })
-      .catch(() => {
-        // keep FALLBACK_IMAGES on failure
+      .catch((error) => {
+        console.error("Failed to load homepage images:", error);
       });
   }, []);
 
   useEffect(() => {
+    if (heroImages.length === 0) return;
+
     const id = setInterval(() => {
       setPrev(current);
       setCurrent((c) => (c + 1) % heroImages.length);
     }, 4000);
     return () => clearInterval(id);
-  }, [current]);
+  }, [current, heroImages.length]);
 
   const goTo = (idx) => {
     if (idx === current) return;
@@ -68,11 +62,15 @@ function ImageSlideshow() {
     setCurrent(idx);
   };
 
+  if (heroImages.length === 0) {
+    return null;
+  }
+
   return (
     <div className="relative w-full aspect-square max-w-[440px] md:max-w-[460px] lg:max-w-[480px] mx-auto overflow-visible">
       {/* Rigid Framework Outer Mask Container */}
       <div className="w-full h-full rounded-[32px] overflow-hidden border-4 border-slate-100 shadow-xl bg-slate-50 relative">
-        {prev !== null && (
+        {prev !== null && heroImages[prev] && (
           <img
             key={`prev-slide-${prev}-${current}`}
             src={heroImages[prev]}
@@ -167,7 +165,6 @@ export default function HeroSection() {
         <div className="absolute -top-40 -left-32 w-[450px] h-[450px] rounded-full blur-[100px] pointer-events-none bg-blue-50/50" />
         <div className="absolute -bottom-40 right-0 w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none bg-amber-50/50" />
 
-        {/* Changed justify-between to justify-center and set tight margins to erase the wide empty zone */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-20">
           {/* Left Typography Content Column */}
           <div className="flex-none space-y-5 w-full max-w-[500px] text-center md:text-left">
