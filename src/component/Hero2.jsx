@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  ArrowRight,
-  GraduationCap,
-  Star,
-  Award,
-  Users,
+import { 
+  ArrowRight, 
+  GraduationCap, 
+  Star, 
+  Award, 
+  Users, 
   CheckCircle2,
-  Calendar,
+  Calendar
 } from "lucide-react";
 import { goToApplicationForm } from "../utils/scrollToForm";
 import { apiGet } from "../config/api";
@@ -73,9 +73,7 @@ function ImageSlideshow() {
         if (isMounted) setLoading(false);
       });
 
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, []);
 
   // Timer logic specifically customized for first slide delay vs subsequent slides
@@ -131,7 +129,7 @@ function ImageSlideshow() {
           alt="ARZ Admissions Display Portfolio"
           className="w-full h-full object-cover slide-current"
         />
-
+        
         {/* Subtle Bottom Vignette */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent z-10 pointer-events-none" />
       </div>
@@ -145,9 +143,7 @@ function ImageSlideshow() {
               onClick={() => goTo(i)}
               aria-label={`Go to slide ${i + 1}`}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === current
-                  ? "w-6 bg-amber-500"
-                  : "w-1.5 bg-slate-300 hover:bg-slate-400"
+                i === current ? "w-6 bg-amber-500" : "w-1.5 bg-slate-300 hover:bg-slate-400"
               }`}
             />
           ))}
@@ -157,21 +153,12 @@ function ImageSlideshow() {
   );
 }
 
-function FloatingBadge({
-  icon: Icon,
-  title,
-  sub,
-  iconBg,
-  animClass,
-  posClass,
-}) {
+function FloatingBadge({ icon: Icon, title, sub, iconBg, animClass, posClass }) {
   return (
     <div
       className={`absolute hidden sm:flex items-center gap-3 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl p-3 shadow-lg shadow-slate-900/5 min-w-[210px] z-20 transition-all hover:scale-105 ${animClass} ${posClass}`}
     >
-      <div
-        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm ${iconBg}`}
-      >
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm ${iconBg}`}>
         <Icon className="w-5 h-5" />
       </div>
       <div className="flex flex-col min-w-0">
@@ -206,8 +193,7 @@ export default function HeroSection() {
         <div
           className="absolute inset-0 pointer-events-none opacity-60"
           style={{
-            backgroundImage:
-              "radial-gradient(circle, rgba(148,163,184,0.15) 1px, transparent 1px)",
+            backgroundImage: "radial-gradient(circle, rgba(148,163,184,0.15) 1px, transparent 1px)",
             backgroundSize: "32px 32px",
           }}
         />
@@ -216,8 +202,10 @@ export default function HeroSection() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            
             {/* Left Column */}
             <div className="lg:col-span-7 text-center lg:text-left space-y-6 max-w-2xl mx-auto lg:mx-0">
+              
               <div
                 className="anim-fadeUp inline-flex items-center gap-2.5 bg-amber-50/80 border border-amber-200/80 rounded-full px-3.5 py-1.5 shadow-sm"
                 style={{ animationDelay: "0.05s" }}
@@ -233,8 +221,7 @@ export default function HeroSection() {
                 style={{ animationDelay: "0.15s" }}
               >
                 From Application <br className="hidden sm:inline" />
-                To Visa, <span className="text-amber-500">We've Got</span>{" "}
-                <br className="hidden sm:inline" />
+                To Visa, <span className="text-amber-500">We've Got</span> <br className="hidden sm:inline" />
                 You Covered
               </h1>
 
@@ -242,9 +229,7 @@ export default function HeroSection() {
                 className="anim-fadeUp text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 font-normal"
                 style={{ animationDelay: "0.25s" }}
               >
-                We guide you through every step of the global education visa
-                process—from selecting top universities to official embassy file
-                preparation.
+                We guide you through every step of the global education visa process—from selecting top universities to official embassy file preparation.
               </p>
 
               <div
@@ -275,10 +260,7 @@ export default function HeroSection() {
                 {STATS.map((s) => {
                   const Icon = s.icon;
                   return (
-                    <div
-                      key={s.label}
-                      className="flex flex-col items-center lg:items-start"
-                    >
+                    <div key={s.label} className="flex flex-col items-center lg:items-start">
                       <div className="flex items-center gap-1.5 text-slate-900 font-black text-xl sm:text-2xl">
                         <Icon className="w-4 h-4 text-amber-500 hidden sm:block" />
                         <span>{s.num}</span>
@@ -290,6 +272,7 @@ export default function HeroSection() {
                   );
                 })}
               </div>
+
             </div>
 
             {/* Right Column */}
@@ -316,6 +299,7 @@ export default function HeroSection() {
                 />
               </div>
             </div>
+
           </div>
         </div>
       </section>
