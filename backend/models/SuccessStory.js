@@ -10,7 +10,8 @@ const successStorySchema = new mongoose.Schema(
     course: String,
     tuition: String,
     intake: String,
-    image: String, // URL
+    story: String, // the post caption — student's own words, shown as the post body
+    image: String, // URL — shown as the post photo
   },
   { timestamps: true },
 );

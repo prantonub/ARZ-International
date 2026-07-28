@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { goToApplicationForm } from "../../utils/scrollToForm";
-import { apiGet } from "../../config/api";
+import SuccessStoriesSection from "./SuccessStoriesSection";
 import officePhoto from "../../assets/ARZ office pic.png";
 import koreaBdImage from "../../assets/koreaxBD.png";
 
@@ -157,109 +156,6 @@ function CTAButtons({ onApply, onContact, variant = "light" }) {
         Free Counseling
       </button>
     </div>
-  );
-}
-
-/* ── Success Stories — blog-style, admin-managed ─────────────────────
-   Reuses the same /success-stories data that powers the homepage
-   section (same admin dashboard tab manages both), just presented as
-   a fuller, blog-like list here instead of a compact card grid.     */
-
-function StoryPost({ story, onApply }) {
-  return (
-    <div
-      className="grid sm:grid-cols-[220px_1fr] gap-6 rounded-2xl overflow-hidden bg-white transition-all duration-200 hover:shadow-lg"
-      style={{ border: "1px solid #eef0f8" }}
-    >
-      <div className="relative h-48 sm:h-full">
-        <img
-          src={
-            story.image ||
-            "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&q=80"
-          }
-          alt={story.name}
-          className="w-full h-full object-cover"
-        />
-        {story.flagCode && (
-          <img
-            src={`https://flagcdn.com/w40/${story.flagCode}.png`}
-            alt=""
-            className="absolute top-3 right-3 w-7 h-5 rounded-sm object-cover border border-white/60"
-          />
-        )}
-      </div>
-      <div className="p-5 sm:pl-0 sm:py-5 flex flex-col justify-center">
-        <span
-          className="inline-block w-fit text-[10px] font-bold uppercase px-2.5 py-1 rounded-full mb-2"
-          style={{ background: "#eafaf0", color: "#1a8a4c" }}
-        >
-          Visa Approved
-        </span>
-        <h3 className="font-display font-bold text-lg text-navy">
-          {story.name}
-        </h3>
-        <p className="text-sm mt-1" style={{ color: "#888" }}>
-          {story.university}
-          {story.country ? ` — ${story.country}` : ""}
-        </p>
-        {story.course && (
-          <p className="text-sm mt-2 leading-relaxed" style={{ color: "#555" }}>
-            {story.course}
-            {story.intake ? ` · Intake: ${story.intake}` : ""}
-            {story.tuition ? ` · ${story.tuition}` : ""}
-          </p>
-        )}
-        <button
-          onClick={onApply}
-          className="mt-4 text-sm font-bold text-brand w-fit border-none bg-transparent cursor-pointer p-0"
-        >
-          Start your own journey →
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function SuccessStoriesSection({ onApply }) {
-  const [stories, setStories] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    apiGet("/success-stories")
-      .then(setStories)
-      .catch(() => setStories([]))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (!loading && stories.length === 0) return null;
-
-  return (
-    <section className="px-6 py-16 md:py-20 max-w-4xl mx-auto">
-      <div className="text-center max-w-xl mx-auto mb-12">
-        <div className="flex justify-center mb-4">
-          <Eyebrow>From Our Students</Eyebrow>
-        </div>
-        <h2 className="font-display font-bold text-2xl md:text-4xl text-navy mb-4">
-          Success Stories
-        </h2>
-        <p className="text-slate-500">
-          Real students, real placements — updated as new students land their
-          offers.
-        </p>
-      </div>
-
-      {loading ? (
-        <div className="text-center py-10 text-sm" style={{ color: "#999" }}>
-          Loading...
-        </div>
-      ) : (
-        <div className="space-y-5">
-          {stories.map((story) => (
-            <StoryPost key={story._id} story={story} onApply={onApply} />
-          ))}
-        </div>
-      )}
-    </section>
   );
 }
 
@@ -424,7 +320,7 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* ── SUCCESS STORIES (blog-style, admin-managed) ─────── */}
+      {/* ── SUCCESS STORIES (FB-post style, admin-managed) ──── */}
       <SuccessStoriesSection onApply={handleApply} />
     </div>
   );

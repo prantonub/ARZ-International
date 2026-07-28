@@ -88,6 +88,7 @@ const emptyStoryForm = {
   course: "",
   tuition: "",
   intake: "",
+  story: "",
   image: "",
 };
 
@@ -1881,6 +1882,7 @@ function StoryFormModal({ editing, password, onClose, onSaved }) {
       course: form.course,
       tuition: form.tuition,
       intake: form.intake,
+      story: form.story,
       image: form.image, // Holds the YouTube Video URL
     };
     try {
@@ -1929,6 +1931,31 @@ function StoryFormModal({ editing, password, onClose, onSaved }) {
         </div>
 
         <div className="space-y-4">
+          {/* ── Post caption — styled like composing a social post ── */}
+          <div
+            className="rounded-xl p-4"
+            style={{ background: "#f8f9ff", border: "1px solid #eef0f8" }}
+          >
+            <div className="flex items-center gap-2.5 mb-3">
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs text-white flex-shrink-0"
+                style={{ background: BRAND.gold }}
+              >
+                {(form.name || "?").slice(0, 1).toUpperCase()}
+              </div>
+              <span className="text-xs font-semibold" style={{ color: "#555" }}>
+                Posting {form.name ? `as ${form.name}` : "a new success story"}
+              </span>
+            </div>
+            <TextArea
+              value={form.story}
+              onChange={(e) => update("story", e.target.value)}
+              rows={3}
+              placeholder="Share their story in their own words — e.g. Alhamdulillah! Excited to share that I got my offer letter from..."
+              className="bg-white"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <Field label="Student Name" required>
               <TextInput
