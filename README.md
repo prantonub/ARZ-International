@@ -211,7 +211,7 @@ This project is developed for educational consultancy purposes.
 
 **Tauhidul Islam Pranto**
 
-Full Stack Web Developer
+MERN Stack Web Developer
 
 ---
 
