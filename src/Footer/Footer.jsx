@@ -388,10 +388,25 @@ const subscribe = async () => {
       <div className="bg-[#0f1b47] py-3 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-            <p className="text-xs text-gray-300">
-              &copy; {new Date().getFullYear()} ARZ International. All rights
-              reserved.
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs text-gray-300">
+              <p>
+                &copy; {new Date().getFullYear()} ARZ International. All rights
+                reserved.
+              </p>
+              <span className="hidden sm:inline text-gray-500">|</span>
+              <p>
+                Designed and developed by{" "}
+                <a
+                  href="https://www.linkedin.com/in/pranto-nub/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#c9a84c] font-semibold hover:underline transition-colors duration-300"
+                >
+                  Tauhidul Islam Pranto
+                </a>
+              </p>
+            </div>
+
             <div className="flex flex-wrap gap-6">
               <Link
                 to="#"
